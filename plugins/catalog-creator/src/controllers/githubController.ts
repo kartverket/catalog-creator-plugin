@@ -86,8 +86,18 @@ export class GithubController {
             }
 
         } else if (response.status === 404) {
+            const emptyRequiredYamlFields: RequiredYamlFields = {
+                apiVersion: 'backstage.io/v1alpha1',
+                kind: "",
+                metadata: {
+                    name: ''
+                },
+                spec: {
+                    type: "",
+                }
+                };
             console.log('catalog-info.yaml does not exist in the repository.');
-            return;
+            return emptyRequiredYamlFields;
         } else {
             console.log('Error checking catalog-info.yaml:', response.statusText);
             return;

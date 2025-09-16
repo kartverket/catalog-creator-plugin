@@ -89,7 +89,7 @@ export const CatalogCreatorPage = () => {
     }
 
     await githubController.submitCatalogInfoToGithub(url, initialYaml, catalogInfoForm);
-    setYamlContent(updateYaml(initialYaml, catalogInfoForm));
+    //setYamlContent(updateYaml(initialYaml, catalogInfoForm));
   };
 
   return (

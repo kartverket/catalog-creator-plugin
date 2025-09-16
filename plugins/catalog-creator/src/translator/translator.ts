@@ -7,6 +7,7 @@ export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): 
 
     const updated: RequiredYamlFields = {
         ...initial,
+        kind: form.kind!,
         metadata: {
             ...initial.metadata,
             name: form.name,
@@ -21,6 +22,7 @@ export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): 
             consumesApis: form.consumesApis?.length ? form.consumesApis : undefined,
             dependsOn: form.dependsOn?.length ? form.dependsOn : undefined,
             definition: form.definition?.length ? form.definition : undefined,
+            type: form.type!
         }
     };
 

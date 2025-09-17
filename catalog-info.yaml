@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: catalog-creator-plugin
+  annotations:
+    github.com/project-slug: kartverket/catalog-creator-plugin
+spec:
+  type: other
+  lifecycle: unknown
+  owner: Ikke-eksisterende-owner

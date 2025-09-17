@@ -26,38 +26,19 @@ export const CatalogForm = (props: CatalogFormProps) => {
         <form onSubmit={props.onSubmit}>
             <Box px={'2rem'}>
                 <Flex direction={'column'} align={'center'}>
-
-                    <Flex direction={'row'} >
-                        <Select
-                            name="Kind"
-                            label="Entity kind"
-                            options={
-                                Object.values(AllowedEntityKinds).map(value => ({
-                                    value: value as AllowedEntityKinds,
-                                    label: value,
-                                }))
-                            }
-                            onSelectionChange={value => {
-                                console.log('Selected kind:', value);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, kind: value as AllowedEntityKinds });
-                            }}
-                            placeholder="Select kind"
-                        />
-
-                        <TextField
-                            name="Name"
-                            label="Entity name"
-                            value={props.catalogInfoForm.name}
-                            onChange={(e: any) => {
-                                console.log('Entity name changed:', e);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, name: e });
-                            }}
-                        />
-                    </Flex>
+                <TextField
+                    name="Name"
+                    label="Entity name *"
+                    value={props.catalogInfoForm.name}
+                    onChange={(e: any) => {
+                        console.log('Entity name changed:', e);
+                        props.setCatalogInfoForm({ ...props.catalogInfoForm, name: e });
+                    }}
+                />
 
                     <TextField
                         name="Owner"
-                        label="Entity owner"
+                        label="Entity owner *"
                         value={props.catalogInfoForm.owner}
                         onChange={(e: any) => {
                             console.log('Entity owner changed:', e);
@@ -65,10 +46,10 @@ export const CatalogForm = (props: CatalogFormProps) => {
                         }}
                     />
 
-                    <Flex direction={'row'} align={'center'}>
+                    <Flex>
                         <Select
                             name="Lifecycle"
-                            label="Entity lifecycle"
+                            label="Entity lifecycle *"
                             options={
                                 Object.values(AllowedLifecycleStages).map(value => ({
                                     value: value as AllowedLifecycleStages,
@@ -84,7 +65,7 @@ export const CatalogForm = (props: CatalogFormProps) => {
 
                         <Select
                             name="Type"
-                            label="Entity type"
+                            label="Entity type *"
                             options={
                                 Object.values(AllowedEntityTypes).map(value => ({
                                     value: value as AllowedEntityTypes,
@@ -106,16 +87,6 @@ export const CatalogForm = (props: CatalogFormProps) => {
                         onChange={(e: any) => {
                             console.log('Entity system changed:', e);
                             props.setCatalogInfoForm({ ...props.catalogInfoForm, system: e });
-                        }}
-                    />
-
-                    <TextField
-                        name="Domain"
-                        label="Entity domain"
-                        value={props.catalogInfoForm.domain}
-                        onChange={(e: any) => {
-                            console.log('Entity domain changed:', e);
-                            props.setCatalogInfoForm({ ...props.catalogInfoForm, domain: e });
                         }}
                     />
 

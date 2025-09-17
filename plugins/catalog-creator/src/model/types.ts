@@ -32,6 +32,11 @@ export type CatalogInfoForm = {
     definition?: string[];
 };
 
+export type Status = {
+    message: string,
+    severity: 'error' | 'success' | 'warning' | 'info'
+}
+
 export type RequiredYamlFields = {
     apiVersion: 'backstage.io/v1alpha1';
     kind: string;

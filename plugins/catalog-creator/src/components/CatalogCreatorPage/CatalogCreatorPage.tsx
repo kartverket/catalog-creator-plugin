@@ -21,17 +21,18 @@ import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
 
 import { useState } from 'react';
 
-import type { CatalogInfoForm, RequiredYamlFields } from '../../model/types';
+import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/types';
 import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
 import { updateYaml } from '../../translator/translator';
+import { Alert } from '@mui/material';
 
 export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields | undefined>(undefined);
+  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields>(undefined);
 
   const [catalogInfoForm, setCatalogInfoForm] = useState<CatalogInfoForm>(
     {
@@ -50,33 +51,38 @@ export const CatalogCreatorPage = () => {
   );
 
   const [yamlContent, setYamlContent] = useState<string>('');
+  const [status, setStatus] = useState<Status | undefined>()
 
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubAuth = useApi(githubAuthApiRef);
   const githubController = new GithubController(catalogImportApi, githubAuth);
 
+  const emptyRequiredYamlFields: RequiredYamlFields = {
+    apiVersion: 'backstage.io/v1alpha1',
+      kind: "Component",
+      metadata: {
+        name: ''
+      },
+      spec: {
+        type: "",
+    },  
+  };
+
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setInitialYaml(undefined)
 
-    const fetchedCatalogInfo = await githubController.fetchCatalogInfo(url);
 
-    setInitialYaml(fetchedCatalogInfo);
-
-    if (fetchedCatalogInfo) {
-      setCatalogInfoForm({
-        kind: fetchedCatalogInfo.kind as any || null,
-        name: fetchedCatalogInfo.metadata.name || '',
-        owner: fetchedCatalogInfo.spec.owner || '',
-        lifecycle: fetchedCatalogInfo.spec.lifecycle as any || null,
-        type: fetchedCatalogInfo.spec.type as any || null,
-        system: fetchedCatalogInfo.spec.system || '',
-        domain: fetchedCatalogInfo.spec.domain || '',
-        providesApis: fetchedCatalogInfo.spec.providesApis || [],
-        consumesApis: fetchedCatalogInfo.spec.consumesApis || [],
-        dependsOn: fetchedCatalogInfo.spec.dependsOn || [],
-        definition: fetchedCatalogInfo.spec.definition || [],
-      });
+    try {
+        const catalogInfoStatus = await githubController.fetchCatalogInfoStatus(url);
+        if (catalogInfoStatus.severity == "success") {
+          setInitialYaml(emptyRequiredYamlFields);
+        }
+        setStatus(catalogInfoStatus)
+    }
+    catch(error : unknown) {
+      console.error("Could not get catalogInfoStatus", error)
     }
   };
 
@@ -119,6 +125,12 @@ export const CatalogCreatorPage = () => {
                 </Flex>
               </Box>
             </form>
+
+            {
+              status && (
+               <Alert sx={{ mx: 2 }} severity={status.severity}>{status.message}</Alert>
+              )
+            }
 
             {initialYaml && (
               <CatalogForm

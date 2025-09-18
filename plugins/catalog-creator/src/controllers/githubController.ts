@@ -1,16 +1,11 @@
-import { OAuthApi } from '@backstage/core-plugin-api';
-import type { CatalogImportApi } from '@backstage/plugin-catalog-import';
-
+import { CatalogImportApi } from '@backstage/plugin-catalog-import';
 import type { CatalogInfoForm, RequiredYamlFields, Status } from '../model/types.ts';
-
-import yaml from 'yaml';
 
 import { updateYaml } from '../translator/translator';
 
 export class GithubController {
     constructor(
         private catalogImportApi: CatalogImportApi,
-        private githubAuthApi: OAuthApi
     ) { }
 
     submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields, catalogInfo: CatalogInfoForm) => {
@@ -50,50 +45,30 @@ export class GithubController {
         }
     };
 
-    fetchCatalogInfoStatus = async (url: string): Promise<Status> => {
-
-        const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-        if (!match) {
-            throw new Error("Invalid Github URL");
-        }
-
-        const owner = match[1];
-        const repo = match[2];
-
-        
+    fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {
+  
         try {
-            const token = await this.githubAuthApi.getAccessToken();
-            const response = await fetch(
-            `https://api.github.com/repos/${owner}/${repo}/contents/catalog-info.yaml`,
-            {
-                headers: {
-                    Authorization: `token ${token}`,
-                    Accept: 'application/vnd.github.v3+json',
-                },
-            });
+            const analysisResult = await this.catalogImportApi.analyzeUrl(url)
 
-            if (response.ok) {
+            if (analysisResult.type == "locations") {
                 return {
                     message: "Catalog-info.yaml already exists",
                     severity: "info"
                 }
-
-            } else if (response.status === 404) {
+            } else if (analysisResult.type == "repository") {
                 return {
-                    message: "Github repository found",
+                    message: "Found repository",
                     severity: "success"
                 }
-            } else {
-            return {
-                    message: `Error checking catalog-info.yaml: ${response.statusText}`,
-                    severity: "error"
-                }
             }
-        } catch(error) {
-            console.error("Could not retrieve github repo ", error)
+        } catch(error : unknown) {
+            if (error instanceof Error) {
+             return {
+                    message: error.message,
+                    severity: "error"
+            }
         }
-    
-
-        // If no entityData, just check if catalog-info.yaml exists and fetch it
     }
+    return undefined
+}
 }

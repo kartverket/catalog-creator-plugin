@@ -15,7 +15,7 @@ import {
 } from '@backstage/core-components';
 
 
-import { useApi, githubAuthApiRef } from '@backstage/core-plugin-api';
+import { useApi } from '@backstage/core-plugin-api';
 
 import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
 
@@ -25,14 +25,13 @@ import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/ty
 import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
-import { updateYaml } from '../../translator/translator';
 import { Alert } from '@mui/material';
 
 export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields>(undefined);
+  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields | undefined>();
 
   const [catalogInfoForm, setCatalogInfoForm] = useState<CatalogInfoForm>(
     {
@@ -54,8 +53,7 @@ export const CatalogCreatorPage = () => {
   const [status, setStatus] = useState<Status | undefined>()
 
   const catalogImportApi = useApi(catalogImportApiRef);
-  const githubAuth = useApi(githubAuthApiRef);
-  const githubController = new GithubController(catalogImportApi, githubAuth);
+  const githubController = new GithubController(catalogImportApi);
 
   const emptyRequiredYamlFields: RequiredYamlFields = {
     apiVersion: 'backstage.io/v1alpha1',
@@ -75,11 +73,11 @@ export const CatalogCreatorPage = () => {
 
 
     try {
-        const catalogInfoStatus = await githubController.fetchCatalogInfoStatus(url);
-        if (catalogInfoStatus.severity == "success") {
+       const status =  await githubController.fetchCatalogInfoStatus(url);
+        if (status && status.severity == "success") {
           setInitialYaml(emptyRequiredYamlFields);
         }
-        setStatus(catalogInfoStatus)
+        setStatus(status)
     }
     catch(error : unknown) {
       console.error("Could not get catalogInfoStatus", error)
@@ -95,7 +93,6 @@ export const CatalogCreatorPage = () => {
     }
 
     await githubController.submitCatalogInfoToGithub(url, initialYaml, catalogInfoForm);
-    //setYamlContent(updateYaml(initialYaml, catalogInfoForm));
   };
 
   return (

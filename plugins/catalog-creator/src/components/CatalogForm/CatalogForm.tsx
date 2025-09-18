@@ -3,11 +3,11 @@ import {
     Box,
     Flex,
     Select,
-    TextField
+    TextField,
 } from '@backstage/ui';
 
 import type { CatalogInfoForm } from '../../model/types';
-import { AllowedEntityKinds, AllowedLifecycleStages, AllowedEntityTypes } from '../../model/types';
+import { AllowedLifecycleStages, AllowedEntityTypes } from '../../model/types';
 
 import { DownloadButton } from '../DownloadButton';
 
@@ -25,7 +25,8 @@ export const CatalogForm = (props: CatalogFormProps) => {
     return (
         <form onSubmit={props.onSubmit}>
             <Box px={'2rem'}>
-                <Flex direction={'column'} align={'center'}>
+                <h1>Catalog-info.yaml Form</h1>
+                <Flex direction={'column'} justify={"start"}>
                 <TextField
                     name="Name"
                     label="Entity name *"

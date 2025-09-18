@@ -68,8 +68,6 @@ export const CatalogCreatorPage = () => {
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-
 
     try {
        const status =  await githubController.fetchCatalogInfoStatus(url);
@@ -81,9 +79,21 @@ export const CatalogCreatorPage = () => {
   };
 
   const submitGithubRepo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
+      e.preventDefault();
+      try{
+        await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
+      }
+     catch(error: unknown){
+      if (error instanceof Error) {
+        setStatus({
+          message: error.message,
+          severity: "error"
+        })
+      }
+      else {
+        throw error
+      }
+     }
   };
 
   return (
@@ -115,7 +125,7 @@ export const CatalogCreatorPage = () => {
             </form>
 
             {
-              status && (
+              (status?.severity !== "success" && status) && (
                <Alert sx={{ mx: 2 }} severity={status.severity}>{status.message}</Alert>
               )
             }

@@ -15,12 +15,7 @@ export class GithubController {
         }
 
         try {
-            // Parse owner and repo from URL
-            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-            if (!match) {
-                console.log('Invalid GitHub repository URL');
-                return;
-            }
+            
 
             const yamlContent = updateYaml(initialYaml, catalogInfo);
 
@@ -41,22 +36,13 @@ export class GithubController {
             console.log('Pull request created:', result.link);
             console.log('Entity will be available at:', result.location);
         } catch (error) {
-            console.error('Error processing GitHub repository:', error);
+            throw error
         }
     };
 
     fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {
   
         try {
-            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-            if (!match) {
-                
-                return {
-                    message: "Invalid GitHub repository URL",
-                    severity: "info"
-                };
-            }
-
             const analysisResult = await this.catalogImportApi.analyzeUrl(url)
             if (analysisResult.type == "locations") {
                 return {
@@ -64,7 +50,6 @@ export class GithubController {
                     severity: "info"
                 }
             } else if (analysisResult.type == "repository") {
-                console.log(analysisResult)
                 return {
                     message: "Found repository",
                     severity: "success"

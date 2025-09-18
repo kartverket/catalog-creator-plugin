@@ -48,14 +48,23 @@ export class GithubController {
     fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {
   
         try {
-            const analysisResult = await this.catalogImportApi.analyzeUrl(url)
+            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+            if (!match) {
+                
+                return {
+                    message: "Invalid GitHub repository URL",
+                    severity: "info"
+                };
+            }
 
+            const analysisResult = await this.catalogImportApi.analyzeUrl(url)
             if (analysisResult.type == "locations") {
                 return {
                     message: "Catalog-info.yaml already exists",
                     severity: "info"
                 }
             } else if (analysisResult.type == "repository") {
+                console.log(analysisResult)
                 return {
                     message: "Found repository",
                     severity: "success"
@@ -66,9 +75,11 @@ export class GithubController {
              return {
                     message: error.message,
                     severity: "error"
+                }
+            } else{
+                throw new Error("Unexpected error")
             }
         }
+        return undefined
     }
-    return undefined
-}
 }

@@ -31,7 +31,6 @@ export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields | undefined>();
 
   const [catalogInfoForm, setCatalogInfoForm] = useState<CatalogInfoForm>(
     {
@@ -69,14 +68,11 @@ export const CatalogCreatorPage = () => {
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setInitialYaml(undefined)
+    
 
 
     try {
        const status =  await githubController.fetchCatalogInfoStatus(url);
-        if (status && status.severity == "success") {
-          setInitialYaml(emptyRequiredYamlFields);
-        }
         setStatus(status)
     }
     catch(error : unknown) {
@@ -87,12 +83,7 @@ export const CatalogCreatorPage = () => {
   const submitGithubRepo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!initialYaml) {
-      console.log('No initial YAML found');
-      return;
-    }
-
-    await githubController.submitCatalogInfoToGithub(url, initialYaml, catalogInfoForm);
+    await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
   };
 
   return (
@@ -129,7 +120,7 @@ export const CatalogCreatorPage = () => {
               )
             }
 
-            {initialYaml && (
+            {(status?.severity == "success") && (
               <CatalogForm
                 onSubmit={submitGithubRepo}
                 catalogInfoForm={catalogInfoForm}

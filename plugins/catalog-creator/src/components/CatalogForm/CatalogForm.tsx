@@ -29,28 +29,30 @@ export const CatalogForm = (props: CatalogFormProps) => {
                 <Flex direction={'column'} justify={"start"}>
                 <TextField
                     name="Name"
-                    label="Entity name *"
+                    label="Entity name"
                     value={props.catalogInfoForm.name}
                     onChange={(e: any) => {
                         console.log('Entity name changed:', e);
                         props.setCatalogInfoForm({ ...props.catalogInfoForm, name: e });
                     }}
+                    isRequired
                 />
 
                     <TextField
                         name="Owner"
-                        label="Entity owner *"
+                        label="Entity owner"
                         value={props.catalogInfoForm.owner}
                         onChange={(e: any) => {
                             console.log('Entity owner changed:', e);
                             props.setCatalogInfoForm({ ...props.catalogInfoForm, owner: e });
                         }}
+                        isRequired
                     />
 
                     <Flex>
                         <Select
                             name="Lifecycle"
-                            label="Entity lifecycle *"
+                            label="Entity lifecycle"
                             options={
                                 Object.values(AllowedLifecycleStages).map(value => ({
                                     value: value as AllowedLifecycleStages,
@@ -62,11 +64,12 @@ export const CatalogForm = (props: CatalogFormProps) => {
                                 props.setCatalogInfoForm({ ...props.catalogInfoForm, lifecycle: value as AllowedLifecycleStages });
                             }}
                             placeholder="Select lifecycle"
+                            isRequired 
                         />
 
                         <Select
                             name="Type"
-                            label="Entity type *"
+                            label="Entity type"
                             options={
                                 Object.values(AllowedEntityTypes).map(value => ({
                                     value: value as AllowedEntityTypes,
@@ -78,6 +81,7 @@ export const CatalogForm = (props: CatalogFormProps) => {
                                 props.setCatalogInfoForm({ ...props.catalogInfoForm, type: value as AllowedEntityTypes });
                             }}
                             placeholder="Select type"
+                            isRequired
                         />
                     </Flex>
 

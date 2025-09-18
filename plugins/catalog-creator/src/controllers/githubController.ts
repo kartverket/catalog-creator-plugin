@@ -14,7 +14,7 @@ export class GithubController {
             return;
         }
 
-        try {
+        
             
 
             const yamlContent = updateYaml(initialYaml, catalogInfo);
@@ -35,9 +35,6 @@ export class GithubController {
 
             console.log('Pull request created:', result.link);
             console.log('Entity will be available at:', result.location);
-        } catch (error) {
-            throw error
-        }
     };
 
     fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {

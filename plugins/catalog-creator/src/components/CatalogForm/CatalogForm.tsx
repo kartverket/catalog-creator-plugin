@@ -7,48 +7,75 @@ import {
 } from '@backstage/ui';
 
 import type { CatalogInfoForm } from '../../model/types';
-import { AllowedLifecycleStages, AllowedEntityTypes } from '../../model/types';
+import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { z } from "zod"
 
 import { DownloadButton } from '../DownloadButton';
+import { formSchema } from '../../schemas/formSchema';
 
 // Props type
 export type CatalogFormProps = {
-    onSubmit: (data: any) => void;
-    catalogInfoForm: CatalogInfoForm;
-    setCatalogInfoForm: (data: CatalogInfoForm) => void;
+    onSubmit: (data: CatalogInfoForm) => void;
     yamlContent: string;
     setYamlContent: (data: string) => void;
 };
 
-export const CatalogForm = (props: CatalogFormProps) => {
+export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
 
+     const { register, handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
+        defaultValues: { name: "", owner: "", lifecycle: "development",  type: "service", system: "" } ,
+        resolver: zodResolver(formSchema),
+        mode: "onBlur"
+        });
+        
+    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => onSubmit({
+        kind: AllowedEntityKinds.Component,
+        name: data.name,
+        owner: data.owner,
+        lifecycle: (data.lifecycle as AllowedLifecycleStages),
+        type: (data.type as AllowedEntityTypes)
+    })
+
+  
     return (
-        <form onSubmit={props.onSubmit}>
+        <form onSubmit={handleSubmit(submitForm)} >
             <Box px={'2rem'}>
                 <h1>Catalog-info.yaml Form</h1>
                 <Flex direction={'column'} justify={"start"}>
-                <TextField
-                    name="Name"
-                    label="Entity name *"
-                    value={props.catalogInfoForm.name}
-                    onChange={(e: any) => {
-                        console.log('Entity name changed:', e);
-                        props.setCatalogInfoForm({ ...props.catalogInfoForm, name: e });
-                    }}
-                />
-
-                    <TextField
-                        name="Owner"
-                        label="Entity owner *"
-                        value={props.catalogInfoForm.owner}
-                        onChange={(e: any) => {
-                            console.log('Entity owner changed:', e);
-                            props.setCatalogInfoForm({ ...props.catalogInfoForm, owner: e });
-                        }}
+                <div>
+                    <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="Name"
+                                label="Entity name *"
+                            />
+                        )}
                     />
+                    {errors.name && <span>{errors.name.message}</span>}
+                </div>
+                <div>
+                    <Controller
+                        name="system"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="Owner"
+                                label="Entity owner *"
+                            />
+                        )}
+                    />
+                    {errors.owner && <span >{errors.owner.message}</span>}
+                </div>
 
                     <Flex>
                         <Select
+                            {...register('lifecycle')}
                             name="Lifecycle"
                             label="Entity lifecycle *"
                             options={
@@ -57,14 +84,11 @@ export const CatalogForm = (props: CatalogFormProps) => {
                                     label: value,
                                 }))
                             }
-                            onSelectionChange={value => {
-                                console.log('Selected lifecycle:', value);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, lifecycle: value as AllowedLifecycleStages });
-                            }}
                             placeholder="Select lifecycle"
                         />
 
                         <Select
+                            {...register('type')}
                             name="Type"
                             label="Entity type *"
                             options={
@@ -73,23 +97,22 @@ export const CatalogForm = (props: CatalogFormProps) => {
                                     label: value,
                                 }))
                             }
-                            onSelectionChange={value => {
-                                console.log('Selected type:', value);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, type: value as AllowedEntityTypes });
-                            }}
                             placeholder="Select type"
                         />
                     </Flex>
 
-                    <TextField
-                        name="System"
-                        label="Entity system"
-                        value={props.catalogInfoForm.system}
-                        onChange={(e: any) => {
-                            console.log('Entity system changed:', e);
-                            props.setCatalogInfoForm({ ...props.catalogInfoForm, system: e });
-                        }}
+                    <Controller
+                        name="system"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="System"
+                                label="Entity System"
+                            />
+                        )}
                     />
+                    {errors.owner && <span >{errors.owner.message}</span>}
 
                     <Flex direction={'row'} align={'center'}>
                         <Button
@@ -98,7 +121,7 @@ export const CatalogForm = (props: CatalogFormProps) => {
                         >
                             Generate YAML
                         </Button>
-                        <DownloadButton yamlContent={props.yamlContent} />
+                        <DownloadButton yamlContent={yamlContent} />
                     </Flex>
 
                 </Flex>

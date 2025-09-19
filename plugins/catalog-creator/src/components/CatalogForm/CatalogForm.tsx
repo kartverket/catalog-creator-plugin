@@ -11,20 +11,18 @@ import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod"
-
-import { DownloadButton } from '../DownloadButton';
 import { formSchema } from '../../schemas/formSchema';
+import { CircularProgress } from '@material-ui/core';
 
 // Props type
 export type CatalogFormProps = {
     onSubmit: (data: CatalogInfoForm) => void;
-    yamlContent: string;
-    setYamlContent: (data: string) => void;
+    isLoading: boolean
 };
 
-export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
+export const CatalogForm = ({onSubmit, isLoading}: CatalogFormProps) => {
 
-     const { register, handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
+     const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
         defaultValues: { name: "", owner: "", system: "" } ,
         resolver: zodResolver(formSchema),
         mode: "onBlur"
@@ -41,6 +39,18 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
 
   
     return (
+        <>
+        { isLoading ? 
+        <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "1.5rem",
+            minHeight: "10rem",
+        }}>
+            <CircularProgress/>
+        </div>
+        :
         <form onSubmit={handleSubmit(submitForm)} >
             <Box px={'2rem'}>
                 <h2>Catalog-info.yaml Form</h2>
@@ -146,13 +156,14 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
                             variant="primary"
                             type='submit'
                         >
-                            Generate YAML
+                            Create pull request
                         </Button>
-                        <DownloadButton yamlContent={yamlContent} />
                     </Flex>
 
                 </Flex>
             </Box>
         </form>
+        }
+        </>
     );
 }

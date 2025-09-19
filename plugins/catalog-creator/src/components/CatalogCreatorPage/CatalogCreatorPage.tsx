@@ -5,6 +5,7 @@ import {
   Card,
   Icon,
   Flex,
+  Link,
 } from '@backstage/ui';
 
 import {
@@ -30,8 +31,9 @@ import { Alert } from '@mui/material';
 export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
-  const [yamlContent, setYamlContent] = useState<string>('');
-  const [status, setStatus] = useState<Status | undefined>()
+  const [status, setStatus] = useState<Status | undefined>();
+  const [submittedPR, setSubmittedPR] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubController = new GithubController(catalogImportApi);
@@ -61,9 +63,10 @@ export const CatalogCreatorPage = () => {
   };
 
   const submitGithubRepo = async (catalogInfoForm: CatalogInfoForm) => {
+    setIsLoading(true)
       try{
         await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
-
+        setSubmittedPR(true)
       }
      catch(error: unknown){
       if (error instanceof Error) {
@@ -76,16 +79,29 @@ export const CatalogCreatorPage = () => {
         throw error
       }
      }
+      setIsLoading(false)
   };
 
   return (
     <Page themeId="tool">
       <Content>
         <ContentHeader title="Catalog Creator">
-          <SupportButton>A description of your plugin goes here.</SupportButton>
+          <SupportButton />
         </ContentHeader>
 
         <Box maxWidth={'500px'}>
+          { submittedPR ? (
+            <Card>
+              <Box px={'2rem'}>
+                <Flex direction={"column"} align={{ xs: 'start', md: 'center' }} py={'2rem'}>
+                  <Alert sx = {{ fontWeight:'bold'}}severity='success'>Successfully created a pull request </Alert>
+                  <Link onClick={() => setSubmittedPR(false)}>Register a new component?</Link>
+                </Flex>
+              </Box>
+            </Card>
+          )
+          :
+          (          
           <Card>
             <form onSubmit={submitFetchCatalogInfo}>
               <Box px={'2rem'}>
@@ -115,11 +131,11 @@ export const CatalogCreatorPage = () => {
             {(status?.severity == "success") && (
               <CatalogForm
                 onSubmit={submitGithubRepo}
-                yamlContent={yamlContent}
-                setYamlContent={setYamlContent}
+                isLoading={isLoading}
               />
             )}
           </Card>
+          )}
         </Box>
       </Content>
     </Page >

@@ -35,6 +35,7 @@ export class GithubController {
 
             console.log('Pull request created:', result.link);
             console.log('Entity will be available at:', result.location);
+            
     };
 
     fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {

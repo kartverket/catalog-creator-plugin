@@ -1,0 +1,26 @@
+name: Publish Catalog Creator to npmjs
+on:
+    workflow_dispatch:
+    push:
+        tags:
+            - "v*"
+jobs:
+    build:
+        defaults:
+            run:
+                working-directory: plugins/catalog-creator
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: "22.x"
+                  registry-url: "https://registry.npmjs.org"
+                  scope: "@kartverket"
+            - run: corepack enable
+            - run: yarn install --immutable
+            - run: yarn tsc
+            - run: yarn build
+            - run: yarn publishToNpm --access public
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.KARTVERKET_NPM_TOKEN }}

@@ -31,7 +31,6 @@ export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields | undefined>();
 
   const [yamlContent, setYamlContent] = useState<string>('');
   const [status, setStatus] = useState<Status | undefined>()
@@ -53,14 +52,9 @@ export const CatalogCreatorPage = () => {
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setInitialYaml(undefined)
-
 
     try {
        const status =  await githubController.fetchCatalogInfoStatus(url);
-        if (status && status.severity == "success") {
-          setInitialYaml(emptyRequiredYamlFields);
-        }
         setStatus(status)
     }
     catch(error : unknown) {
@@ -68,14 +62,21 @@ export const CatalogCreatorPage = () => {
     }
   };
 
-  const submitGithubRepo = async (catalogForm : CatalogInfoForm) => {
-
-    if (!initialYaml) {
-      console.log('No initial YAML found');
-      return;
-    }
-
-    await githubController.submitCatalogInfoToGithub(url, initialYaml, catalogForm);
+  const submitGithubRepo = async (catalogInfoForm: CatalogInfoForm) => {
+      try{
+        await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
+      }
+     catch(error: unknown){
+      if (error instanceof Error) {
+        setStatus({
+          message: error.message,
+          severity: "error"
+        })
+      }
+      else {
+        throw error
+      }
+     }
   };
 
   return (
@@ -107,12 +108,12 @@ export const CatalogCreatorPage = () => {
             </form>
 
             {
-              status && (
+              (status?.severity !== "success" && status) && (
                <Alert sx={{ mx: 2 }} severity={status.severity}>{status.message}</Alert>
               )
             }
 
-            {initialYaml && (
+            {(status?.severity == "success") && (
               <CatalogForm
                 onSubmit={submitGithubRepo}
                 yamlContent={yamlContent}

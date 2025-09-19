@@ -25,7 +25,7 @@ export type CatalogFormProps = {
 export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
 
      const { register, handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
-        defaultValues: { name: "", owner: "", lifecycle: "development",  type: "service", system: "" } ,
+        defaultValues: { name: "", owner: "", system: "" } ,
         resolver: zodResolver(formSchema),
         mode: "onBlur"
         });
@@ -42,7 +42,7 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
     return (
         <form onSubmit={handleSubmit(submitForm)} >
             <Box px={'2rem'}>
-                <h1>Catalog-info.yaml Form</h1>
+                <h2>Catalog-info.yaml Form</h2>
                 <Flex direction={'column'} justify={"start"}>
                 <div>
                     <Controller
@@ -52,32 +52,35 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
                         <TextField
                                 {...field}
                                 name="Name"
-                                label="Entity name *"
+                                label="Entity name"
+                                isRequired
                             />
                         )}
                     />
-                    {errors.name && <span>{errors.name.message}</span>}
+                    {errors.name && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.name.message}</span>}
                 </div>
                 <div>
                     <Controller
-                        name="system"
+                        name="owner"
                         control={control}
                         render={({ field }) => (
                         <TextField
                                 {...field}
                                 name="Owner"
-                                label="Entity owner *"
+                                label="Entity owner"
+                                isRequired
                             />
                         )}
                     />
-                    {errors.owner && <span >{errors.owner.message}</span>}
+                    {errors.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.owner.message}</span>}
                 </div>
 
                     <Flex>
+                        <div>
                         <Select
                             {...register('lifecycle')}
                             name="Lifecycle"
-                            label="Entity lifecycle *"
+                            label="Entity lifecycle"
                             options={
                                 Object.values(AllowedLifecycleStages).map(value => ({
                                     value: value as AllowedLifecycleStages,
@@ -85,20 +88,27 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
                                 }))
                             }
                             placeholder="Select lifecycle"
+                            isRequired 
                         />
+                         {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
+                        </div>
 
-                        <Select
-                            {...register('type')}
-                            name="Type"
-                            label="Entity type *"
-                            options={
-                                Object.values(AllowedEntityTypes).map(value => ({
-                                    value: value as AllowedEntityTypes,
-                                    label: value,
-                                }))
-                            }
-                            placeholder="Select type"
-                        />
+                        <div>
+                            <Select
+                                {...register('type')}
+                                name="Type"
+                                label="Entity type"
+                                options={
+                                    Object.values(AllowedEntityTypes).map(value => ({
+                                        value: value as AllowedEntityTypes,
+                                        label: value,
+                                    }))
+                                }
+                                placeholder="Select type"
+                                isRequired
+                            />
+                            {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
+                        </div>
                     </Flex>
 
                     <Controller
@@ -112,7 +122,7 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
                             />
                         )}
                     />
-                    {errors.owner && <span >{errors.owner.message}</span>}
+                    {errors.system && <span >{errors.system.message}</span>}
 
                     <Flex direction={'row'} align={'center'}>
                         <Button

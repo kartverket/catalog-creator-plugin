@@ -14,13 +14,8 @@ export class GithubController {
             return;
         }
 
-        try {
-            // Parse owner and repo from URL
-            const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-            if (!match) {
-                console.log('Invalid GitHub repository URL');
-                return;
-            }
+        
+            
 
             const yamlContent = updateYaml(initialYaml, catalogInfo);
 
@@ -40,16 +35,12 @@ export class GithubController {
 
             console.log('Pull request created:', result.link);
             console.log('Entity will be available at:', result.location);
-        } catch (error) {
-            console.error('Error processing GitHub repository:', error);
-        }
     };
 
     fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {
   
         try {
             const analysisResult = await this.catalogImportApi.analyzeUrl(url)
-
             if (analysisResult.type == "locations") {
                 return {
                     message: "Catalog-info.yaml already exists",
@@ -66,9 +57,11 @@ export class GithubController {
              return {
                     message: error.message,
                     severity: "error"
+                }
+            } else{
+                throw new Error("Unexpected error")
             }
         }
+        return undefined
     }
-    return undefined
-}
 }

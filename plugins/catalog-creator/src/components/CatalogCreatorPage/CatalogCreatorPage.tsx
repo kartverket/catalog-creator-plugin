@@ -30,8 +30,6 @@ import { Alert } from '@mui/material';
 export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
-
-
   const [yamlContent, setYamlContent] = useState<string>('');
   const [status, setStatus] = useState<Status | undefined>()
 
@@ -55,7 +53,7 @@ export const CatalogCreatorPage = () => {
 
     try {
        const status =  await githubController.fetchCatalogInfoStatus(url);
-        setStatus(status)
+       setStatus(status)
     }
     catch(error : unknown) {
       console.error("Could not get catalogInfoStatus", error)
@@ -65,6 +63,7 @@ export const CatalogCreatorPage = () => {
   const submitGithubRepo = async (catalogInfoForm: CatalogInfoForm) => {
       try{
         await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
+
       }
      catch(error: unknown){
       if (error instanceof Error) {

@@ -35,7 +35,8 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
         name: data.name,
         owner: data.owner,
         lifecycle: (data.lifecycle as AllowedLifecycleStages),
-        type: (data.type as AllowedEntityTypes)
+        type: (data.type as AllowedEntityTypes),
+        system: data.system,
     })
 
   
@@ -77,40 +78,55 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
 
                     <Flex>
                         <div>
-                        <Select
-                            {...register('lifecycle')}
-                            name="Lifecycle"
-                            label="Entity lifecycle"
-                            options={
-                                Object.values(AllowedLifecycleStages).map(value => ({
-                                    value: value as AllowedLifecycleStages,
-                                    label: value,
-                                }))
-                            }
-                            placeholder="Select lifecycle"
-                            isRequired 
+                        <Controller
+                            name="lifecycle"
+                            control={control}
+                            render={({ 
+                                field:{ onChange, onBlur } 
+                            }) => (
+                                <Select
+                                    name="lifecycle"
+                                    label="Entity lifecycle"
+                                    onBlur={onBlur}
+                                    onSelectionChange={onChange}
+                                    options={
+                                        Object.values(AllowedLifecycleStages).map(value => ({
+                                            value: value as string,
+                                            label: value,
+                                        }))
+                                    }
+                                    isRequired
+                                />)}
                         />
                          {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
                         </div>
 
                         <div>
-                            <Select
-                                {...register('type')}
-                                name="Type"
-                                label="Entity type"
-                                options={
-                                    Object.values(AllowedEntityTypes).map(value => ({
-                                        value: value as AllowedEntityTypes,
-                                        label: value,
-                                    }))
-                                }
-                                placeholder="Select type"
-                                isRequired
-                            />
-                            {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
+                        <Controller
+                            name="type"
+                            control={control}
+                            render={({ 
+                                field:{ onChange, onBlur } 
+                            }) => (
+                                <Select
+                                    name="type"
+                                    label="Entity type"
+                                    onBlur={onBlur}
+                                    onSelectionChange={onChange}
+                                    options={
+                                        Object.values(AllowedEntityTypes).map(value => ({
+                                            value: value as string,
+                                            label: value,
+                                        }))
+                                    }
+                                    isRequired
+                                />)}
+                        />
+                         {errors.type && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.type.message}</span>}
                         </div>
-                    </Flex>
 
+                    </Flex>
+                    <div>
                     <Controller
                         name="system"
                         control={control}
@@ -122,7 +138,8 @@ export const CatalogForm = ({onSubmit, yamlContent}: CatalogFormProps) => {
                             />
                         )}
                     />
-                    {errors.system && <span >{errors.system.message}</span>}
+                     {errors.system && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.system.message}</span>}
+                     </div>
 
                     <Flex direction={'row'} align={'center'}>
                         <Button

@@ -15,23 +15,22 @@ import {
 } from '@backstage/core-components';
 
 
-import { useApi, githubAuthApiRef } from '@backstage/core-plugin-api';
+import { useApi } from '@backstage/core-plugin-api';
 
 import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
 
 import { useState } from 'react';
 
-import type { CatalogInfoForm, RequiredYamlFields } from '../../model/types';
+import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/types';
 import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
-import { updateYaml } from '../../translator/translator';
+import { Alert } from '@mui/material';
 
 export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [initialYaml, setInitialYaml] = useState<RequiredYamlFields | undefined>(undefined);
 
   const [catalogInfoForm, setCatalogInfoForm] = useState<CatalogInfoForm>(
     {
@@ -50,46 +49,51 @@ export const CatalogCreatorPage = () => {
   );
 
   const [yamlContent, setYamlContent] = useState<string>('');
+  const [status, setStatus] = useState<Status | undefined>()
 
   const catalogImportApi = useApi(catalogImportApiRef);
-  const githubAuth = useApi(githubAuthApiRef);
-  const githubController = new GithubController(catalogImportApi, githubAuth);
+  const githubController = new GithubController(catalogImportApi);
+
+  const emptyRequiredYamlFields: RequiredYamlFields = {
+    apiVersion: 'backstage.io/v1alpha1',
+      kind: "Component",
+      metadata: {
+        name: ''
+      },
+      spec: {
+        type: "",
+    },  
+  };
 
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const fetchedCatalogInfo = await githubController.fetchCatalogInfo(url);
-
-    setInitialYaml(fetchedCatalogInfo);
-
-    if (fetchedCatalogInfo) {
-      setCatalogInfoForm({
-        kind: fetchedCatalogInfo.kind as any || null,
-        name: fetchedCatalogInfo.metadata.name || '',
-        owner: fetchedCatalogInfo.spec.owner || '',
-        lifecycle: fetchedCatalogInfo.spec.lifecycle as any || null,
-        type: fetchedCatalogInfo.spec.type as any || null,
-        system: fetchedCatalogInfo.spec.system || '',
-        domain: fetchedCatalogInfo.spec.domain || '',
-        providesApis: fetchedCatalogInfo.spec.providesApis || [],
-        consumesApis: fetchedCatalogInfo.spec.consumesApis || [],
-        dependsOn: fetchedCatalogInfo.spec.dependsOn || [],
-        definition: fetchedCatalogInfo.spec.definition || [],
-      });
+    try {
+       const status =  await githubController.fetchCatalogInfoStatus(url);
+        setStatus(status)
+    }
+    catch(error : unknown) {
+      console.error("Could not get catalogInfoStatus", error)
     }
   };
 
   const submitGithubRepo = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!initialYaml) {
-      console.log('No initial YAML found');
-      return;
-    }
-
-    await githubController.submitCatalogInfoToGithub(url, initialYaml, catalogInfoForm);
-    setYamlContent(updateYaml(initialYaml, catalogInfoForm));
+      e.preventDefault();
+      try{
+        await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
+      }
+     catch(error: unknown){
+      if (error instanceof Error) {
+        setStatus({
+          message: error.message,
+          severity: "error"
+        })
+      }
+      else {
+        throw error
+      }
+     }
   };
 
   return (
@@ -120,7 +124,13 @@ export const CatalogCreatorPage = () => {
               </Box>
             </form>
 
-            {initialYaml && (
+            {
+              (status?.severity !== "success" && status) && (
+               <Alert sx={{ mx: 2 }} severity={status.severity}>{status.message}</Alert>
+              )
+            }
+
+            {(status?.severity == "success") && (
               <CatalogForm
                 onSubmit={submitGithubRepo}
                 catalogInfoForm={catalogInfoForm}

@@ -22,8 +22,8 @@ export type CatalogInfoForm = {
     kind: AllowedEntityKinds | null;
     name: string;
     owner: string;
-    lifecycle?: AllowedLifecycleStages | null;
-    type?: AllowedEntityTypes | null;
+    lifecycle: AllowedLifecycleStages;
+    type: AllowedEntityTypes | null;
     system?: string;
     domain?: string;
     providesApis?: string[];

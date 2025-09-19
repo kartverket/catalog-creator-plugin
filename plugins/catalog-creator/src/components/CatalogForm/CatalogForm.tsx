@@ -7,106 +7,163 @@ import {
 } from '@backstage/ui';
 
 import type { CatalogInfoForm } from '../../model/types';
-import { AllowedLifecycleStages, AllowedEntityTypes } from '../../model/types';
-
-import { DownloadButton } from '../DownloadButton';
+import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { z } from "zod"
+import { formSchema } from '../../schemas/formSchema';
+import { CircularProgress } from '@material-ui/core';
 
 // Props type
 export type CatalogFormProps = {
-    onSubmit: (data: any) => void;
-    catalogInfoForm: CatalogInfoForm;
-    setCatalogInfoForm: (data: CatalogInfoForm) => void;
-    yamlContent: string;
-    setYamlContent: (data: string) => void;
+    onSubmit: (data: CatalogInfoForm) => void;
+    isLoading: boolean
 };
 
-export const CatalogForm = (props: CatalogFormProps) => {
+export const CatalogForm = ({onSubmit, isLoading}: CatalogFormProps) => {
 
+     const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
+        defaultValues: { name: "", owner: "", system: "" } ,
+        resolver: zodResolver(formSchema),
+        mode: "onBlur"
+        });
+        
+    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => onSubmit({
+        kind: AllowedEntityKinds.Component,
+        name: data.name,
+        owner: data.owner,
+        lifecycle: (data.lifecycle as AllowedLifecycleStages),
+        type: (data.type as AllowedEntityTypes),
+        system: data.system,
+    })
+
+  
     return (
-        <form onSubmit={props.onSubmit}>
+        <>
+        { isLoading ? 
+        <div style={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: "1.5rem",
+            minHeight: "10rem",
+        }}>
+            <CircularProgress/>
+        </div>
+        :
+        <form onSubmit={handleSubmit(submitForm)} >
             <Box px={'2rem'}>
-                <h1>Catalog-info.yaml Form</h1>
+                <h2>Catalog-info.yaml Form</h2>
                 <Flex direction={'column'} justify={"start"}>
-                <TextField
-                    name="Name"
-                    label="Entity name"
-                    value={props.catalogInfoForm.name}
-                    onChange={(e: any) => {
-                        console.log('Entity name changed:', e);
-                        props.setCatalogInfoForm({ ...props.catalogInfoForm, name: e });
-                    }}
-                    isRequired
-                />
-
-                    <TextField
-                        name="Owner"
-                        label="Entity owner"
-                        value={props.catalogInfoForm.owner}
-                        onChange={(e: any) => {
-                            console.log('Entity owner changed:', e);
-                            props.setCatalogInfoForm({ ...props.catalogInfoForm, owner: e });
-                        }}
-                        isRequired
+                <div>
+                    <Controller
+                        name="name"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="Name"
+                                label="Entity name"
+                                isRequired
+                            />
+                        )}
                     />
+                    {errors.name && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.name.message}</span>}
+                </div>
+                <div>
+                    <Controller
+                        name="owner"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="Owner"
+                                label="Entity owner"
+                                isRequired
+                            />
+                        )}
+                    />
+                    {errors.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.owner.message}</span>}
+                </div>
 
                     <Flex>
-                        <Select
-                            name="Lifecycle"
-                            label="Entity lifecycle"
-                            options={
-                                Object.values(AllowedLifecycleStages).map(value => ({
-                                    value: value as AllowedLifecycleStages,
-                                    label: value,
-                                }))
-                            }
-                            onSelectionChange={value => {
-                                console.log('Selected lifecycle:', value);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, lifecycle: value as AllowedLifecycleStages });
-                            }}
-                            placeholder="Select lifecycle"
-                            isRequired 
+                        <div>
+                        <Controller
+                            name="lifecycle"
+                            control={control}
+                            render={({ 
+                                field:{ onChange, onBlur } 
+                            }) => (
+                                <Select
+                                    name="lifecycle"
+                                    label="Entity lifecycle"
+                                    onBlur={onBlur}
+                                    onSelectionChange={onChange}
+                                    options={
+                                        Object.values(AllowedLifecycleStages).map(value => ({
+                                            value: value as string,
+                                            label: value,
+                                        }))
+                                    }
+                                    isRequired
+                                />)}
                         />
+                         {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
+                        </div>
 
-                        <Select
-                            name="Type"
-                            label="Entity type"
-                            options={
-                                Object.values(AllowedEntityTypes).map(value => ({
-                                    value: value as AllowedEntityTypes,
-                                    label: value,
-                                }))
-                            }
-                            onSelectionChange={value => {
-                                console.log('Selected type:', value);
-                                props.setCatalogInfoForm({ ...props.catalogInfoForm, type: value as AllowedEntityTypes });
-                            }}
-                            placeholder="Select type"
-                            isRequired
+                        <div>
+                        <Controller
+                            name="type"
+                            control={control}
+                            render={({ 
+                                field:{ onChange, onBlur } 
+                            }) => (
+                                <Select
+                                    name="type"
+                                    label="Entity type"
+                                    onBlur={onBlur}
+                                    onSelectionChange={onChange}
+                                    options={
+                                        Object.values(AllowedEntityTypes).map(value => ({
+                                            value: value as string,
+                                            label: value,
+                                        }))
+                                    }
+                                    isRequired
+                                />)}
                         />
+                         {errors.type && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.type.message}</span>}
+                        </div>
+
                     </Flex>
-
-                    <TextField
-                        name="System"
-                        label="Entity system"
-                        value={props.catalogInfoForm.system}
-                        onChange={(e: any) => {
-                            console.log('Entity system changed:', e);
-                            props.setCatalogInfoForm({ ...props.catalogInfoForm, system: e });
-                        }}
+                    <div>
+                    <Controller
+                        name="system"
+                        control={control}
+                        render={({ field }) => (
+                        <TextField
+                                {...field}
+                                name="System"
+                                label="Entity System"
+                            />
+                        )}
                     />
+                     {errors.system && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.system.message}</span>}
+                     </div>
 
                     <Flex direction={'row'} align={'center'}>
                         <Button
                             variant="primary"
                             type='submit'
                         >
-                            Generate YAML
+                            Create pull request
                         </Button>
-                        <DownloadButton yamlContent={props.yamlContent} />
                     </Flex>
 
                 </Flex>
             </Box>
         </form>
+        }
+        </>
     );
 }

@@ -61,7 +61,8 @@
     "react-dom": "^18",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0",
-    "react-use": "^17.2.4"
+    "react-use": "^17.2.4",
+    "zod": "^4.1.11"
   },
   "devDependencies": {
     "@backstage/test-utils": "backstage:^",

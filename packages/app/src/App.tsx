@@ -48,7 +48,7 @@ import { DevToolsPage } from '@backstage/plugin-devtools';
 import { DaskOnboardingPage } from '@kartverket/backstage-plugin-dask-onboarding';
 import { pluginRiScNorwegianTranslation } from '@kartverket/backstage-plugin-risk-scorecard';
 import { OpencostPage } from '@kartverket/backstage-plugin-opencost';
-import { CatalogCreatorPage } from '@kartverket/plugin-catalog-creator';
+import { CatalogCreatorPage, catalogCreatorPlugin } from '@kartverket/plugin-catalog-creator';
 
 const app = createApp({
   __experimentalTranslations: {
@@ -100,7 +100,7 @@ const app = createApp({
       registerApi: catalogImportPlugin.routes.importPage,
     });
     bind(scaffolderPlugin.externalRoutes, {
-      registerComponent: catalogImportPlugin.routes.importPage,
+      registerComponent: catalogCreatorPlugin.routes.root,
       viewTechDoc: techdocsPlugin.routes.docRoot,
     });
     bind(orgPlugin.externalRoutes, {

@@ -5,8 +5,7 @@ import {
   Card,
   Icon,
   Flex,
-  Link,
-  Grid
+  Link
 } from '@backstage/ui';
 
 import {

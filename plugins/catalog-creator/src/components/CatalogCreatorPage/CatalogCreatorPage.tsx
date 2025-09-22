@@ -5,7 +5,7 @@ import {
   Card,
   Icon,
   Flex,
-  Link,
+  Link
 } from '@backstage/ui';
 
 import {
@@ -105,21 +105,22 @@ export const CatalogCreatorPage = () => {
           <Card>
             <form onSubmit={submitFetchCatalogInfo}>
               <Box px={'2rem'}>
-                <Flex direction={'row'} align={'end'}>
-                  <TextField
-                    style={{flexGrow: 1}}
-                    label="Repository URL"
-                    size="small"
-                    icon={<Icon name="sparkling" />}
-                    placeholder="Enter a URL"
-                    name="url"
-                    value={url}
-                    onChange={(e) => {
-                      setUrl(e);
-                    }}
-                  />
-                  <Button type='submit'>Fetch!</Button>
-                </Flex>
+                  <Flex align="end">
+                    <div style={{flexGrow: 1}}>
+                      <TextField
+                        label="Repository URL"
+                        size="small"
+                        icon={<Icon name="sparkling" />}
+                        placeholder="Enter a URL"
+                        name="url"
+                        value={url}
+                        onChange={(e) => {
+                          setUrl(e);
+                        }}
+                      />
+                    </div>
+                    <Button type='submit'>Fetch!</Button>
+               </Flex>
               </Box>
             </form>
 

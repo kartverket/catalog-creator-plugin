@@ -107,6 +107,7 @@ export const CatalogCreatorPage = () => {
               <Box px={'2rem'}>
                 <Flex direction={'row'} align={'end'}>
                   <TextField
+                    style={{flexGrow: 1}}
                     label="Repository URL"
                     size="small"
                     icon={<Icon name="sparkling" />}

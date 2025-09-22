@@ -10,7 +10,7 @@ import type { CatalogInfoForm } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
-import { z } from "zod"
+import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
 

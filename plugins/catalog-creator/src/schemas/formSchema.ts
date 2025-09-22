@@ -1,4 +1,4 @@
-import * as z from "zod";
+import * as z from "zod/v4";
 
 export const formSchema = z.object({
     name: z.string().trim().min(1, "Add a name").refine(s => !s.includes(' '), { message: "Name cannot contain space"}).refine(s => !/^[.!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]|[.!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]$/.test(s), 

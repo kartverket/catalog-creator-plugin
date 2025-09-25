@@ -34,6 +34,8 @@ export const CatalogCreatorPage = () => {
   const [status, setStatus] = useState<Status | undefined>();
   const [submittedPR, setSubmittedPR] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  //  const data = useGetCatalogInfo("https://github.com/kartverket/kartverket.dev/blob/github-test/catalog-info.yaml")
+  // console.log(data)
 
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubController = new GithubController(catalogImportApi);
@@ -72,7 +74,7 @@ export const CatalogCreatorPage = () => {
       if (error instanceof Error) {
         setStatus({
           message: error.message,
-          severity: "error"
+          severity: "error",
         })
       }
       else {
@@ -130,10 +132,11 @@ export const CatalogCreatorPage = () => {
               )
             }
 
-            {(status?.severity == "success") && (
+            {(status?.severity == "success" || status?.severity == "info") && (
               <CatalogForm
                 onSubmit={submitGithubRepo}
                 isLoading={isLoading}
+                status={status}
               />
             )}
           </Card>

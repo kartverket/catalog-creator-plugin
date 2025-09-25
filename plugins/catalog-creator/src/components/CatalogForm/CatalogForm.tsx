@@ -6,21 +6,30 @@ import {
     TextField,
 } from '@backstage/ui';
 
-import type { CatalogInfoForm } from '../../model/types';
+import type { CatalogInfoForm, Status } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
+import { getCatalogInfo } from '../../utils/getCatalogInfo';
 
 // Props type
 export type CatalogFormProps = {
     onSubmit: (data: CatalogInfoForm) => void;
-    isLoading: boolean
+    isLoading: boolean,
+    status: Status
 };
 
-export const CatalogForm = ({onSubmit, isLoading}: CatalogFormProps) => {
+export const CatalogForm = ({onSubmit, isLoading, status}: CatalogFormProps) => {
+
+    var defaultValues = null
+    
+    if (status.url) {
+        defaultValues = getCatalogInfo(status.url)
+    }
+
 
      const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
         defaultValues: { name: "", owner: "", system: "" } ,

@@ -34,7 +34,8 @@ export type CatalogInfoForm = {
 
 export type Status = {
     message: string,
-    severity: 'error' | 'success' | 'warning' | 'info'
+    severity: 'error' | 'success' | 'warning' | 'info',
+    url?: string
 }
 
 export type RequiredYamlFields = {

@@ -43,21 +43,23 @@ export class GithubController {
         try {
             const analysisResult = await this.catalogImportApi.analyzeUrl(url)
             if (analysisResult.type == "locations") {
+                console.log(analysisResult)
                 return {
                     message: "Catalog-info.yaml already exists",
-                    severity: "info"
+                    severity: "info",
+                    url: analysisResult.locations[0].target
                 }
             } else if (analysisResult.type == "repository") {
                 return {
                     message: "Found repository",
-                    severity: "success"
+                    severity: "success",
                 }
             }
         } catch(error : unknown) {
             if (error instanceof Error) {
              return {
                     message: error.message,
-                    severity: "error"
+                    severity: "error",
                 }
             } else{
                 throw new Error("Unexpected error")

@@ -3,11 +3,10 @@ import yaml from 'yaml';
 
 export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): string => {
 
-    console.log('Initial YAML content:', yaml.stringify(initial));
+    
 
     const updated: RequiredYamlFields = {
         ...initial,
-        kind: "Component",
         metadata: {
             ...initial.metadata,
             name: form.name,
@@ -26,7 +25,7 @@ export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): 
         }
     };
 
-    console.log('Generated YAML content:', yaml.stringify(updated));
+    
 
     const yamlContent = yaml.stringify(updated);
 

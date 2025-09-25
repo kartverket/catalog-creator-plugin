@@ -13,26 +13,27 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
-import { getCatalogInfo } from '../../utils/getCatalogInfo';
 
 // Props type
 export type CatalogFormProps = {
     onSubmit: (data: CatalogInfoForm) => void;
     isLoading: boolean,
-    status: Status
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>> 
+    status: Status,
+    defaultValues : {
+            name: string,
+            owner: string,
+    }
 };
 
-export const CatalogForm = ({onSubmit, isLoading, status}: CatalogFormProps) => {
-
-    var defaultValues = null
-    
-    if (status.url) {
-        defaultValues = getCatalogInfo(status.url)
-    }
+export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormProps) => {
 
 
      const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
-        defaultValues: { name: "", owner: "", system: "" } ,
+        defaultValues: { 
+            name: defaultValues.name,
+             owner: defaultValues.owner
+            } ,
         resolver: zodResolver(formSchema),
         mode: "onBlur"
         });

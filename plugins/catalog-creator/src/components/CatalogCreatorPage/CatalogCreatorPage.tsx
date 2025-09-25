@@ -16,7 +16,7 @@ import {
 } from '@backstage/core-components';
 
 
-import { useApi } from '@backstage/core-plugin-api';
+import { githubAuthApiRef, OAuthApi, useApi } from '@backstage/core-plugin-api';
 
 import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
 
@@ -27,6 +27,7 @@ import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
 import { Alert } from '@mui/material';
+import { getCatalogInfo } from '../../utils/getCatalogInfo';
 
 export const CatalogCreatorPage = () => {
 
@@ -34,13 +35,17 @@ export const CatalogCreatorPage = () => {
   const [status, setStatus] = useState<Status | undefined>();
   const [submittedPR, setSubmittedPR] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  //List of yaml objects (entities)
+  const [response, setResponse] = useState<RequiredYamlFields[] | null>(null)
+  
   //  const data = useGetCatalogInfo("https://github.com/kartverket/kartverket.dev/blob/github-test/catalog-info.yaml")
   // console.log(data)
 
   const catalogImportApi = useApi(catalogImportApiRef);
+  const githubAuthApi : OAuthApi = useApi(githubAuthApiRef);
   const githubController = new GithubController(catalogImportApi);
 
-  const emptyRequiredYamlFields: RequiredYamlFields = {
+  const emptyRequiredYamlFields: RequiredYamlFields[] = [{
     apiVersion: 'backstage.io/v1alpha1',
       kind: "Component",
       metadata: {
@@ -49,27 +54,38 @@ export const CatalogCreatorPage = () => {
       spec: {
         type: "",
     },  
-  };
+  }];
 
 
   const submitFetchCatalogInfo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    setIsLoading(true)
     try {
-       const status =  await githubController.fetchCatalogInfoStatus(url);
-       setStatus(status)
+       const catalogStatus =  await githubController.fetchCatalogInfoStatus(url);
+       if (catalogStatus?.url) {
+          setUrl(catalogStatus.url)
+          const catalogInfoResponse = await getCatalogInfo(url, githubAuthApi)
+          setResponse(catalogInfoResponse)
+       }
+       setStatus(catalogStatus)
     }
     catch(error : unknown) {
       console.error("Could not get catalogInfoStatus", error)
+    } finally {
+       setIsLoading(false)
     }
   };
 
   const submitGithubRepo = async (catalogInfoForm: CatalogInfoForm) => {
     setIsLoading(true)
       try{
-        await githubController.submitCatalogInfoToGithub(url, emptyRequiredYamlFields, catalogInfoForm);
-        setSubmittedPR(true)
-      }
+          // old code that works for no catalog-info basic case
+           const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoForm, githubAuthApi);
+           if (prStatus?.severity == "success") {
+            setSubmittedPR(true)
+           }
+           setStatus(prStatus)
+        }
      catch(error: unknown){
       if (error instanceof Error) {
         setStatus({
@@ -136,7 +152,12 @@ export const CatalogCreatorPage = () => {
               <CatalogForm
                 onSubmit={submitGithubRepo}
                 isLoading={isLoading}
+                setIsLoading={setIsLoading}
                 status={status}
+                defaultValues={{
+                  name: response ? response[0].metadata.name : "",
+                  owner: response ? response[0].spec.owner! : "",
+                }}
               />
             )}
           </Card>

@@ -1,6 +1,7 @@
 export enum AllowedEntityKinds {
     Component = 'Component',
     API = 'API',
+    Template = "Template",
     System = 'System',
     Domain = 'Domain',
     Resource = 'Resource'
@@ -15,11 +16,12 @@ export enum AllowedLifecycleStages {
 export enum AllowedEntityTypes {
     service = 'service',
     library = 'library',
-    website = 'website'
+    website = 'website',
+    openapi = 'openapi'
 };
 
 export type CatalogInfoForm = {
-    kind: AllowedEntityKinds | null;
+    kind: AllowedEntityKinds;
     name: string;
     owner: string;
     lifecycle: AllowedLifecycleStages;

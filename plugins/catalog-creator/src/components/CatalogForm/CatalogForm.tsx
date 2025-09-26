@@ -6,13 +6,14 @@ import {
     TextField,
 } from '@backstage/ui';
 
-import type { CatalogInfoForm, Status } from '../../model/types';
-import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
+import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/types';
+import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds} from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
+import Divider from '@mui/material/Divider';
 
 // Props type
 export type CatalogFormProps = {
@@ -20,25 +21,42 @@ export type CatalogFormProps = {
     isLoading: boolean,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>> 
     status: Status,
-    defaultValues : {
-            name: string,
-            owner: string,
-    }
+    currentYaml : RequiredYamlFields[] | null
 };
 
 
-export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormProps) => {
+export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps) => {
 
+    const getDefaultValues = () => {
+        if (currentYaml) {
+            return currentYaml.map((entry : RequiredYamlFields) => {
+                return {
+                    kind: entry.kind as AllowedEntityKinds,
+                    name: entry.metadata.name,
+                    owner: entry.spec.owner,
+                    lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
+                    entityType: entry.spec.type as AllowedEntityTypes,
+                    system: entry.spec.system,
+                }
+            })
+        } else {
+             return [{
+                    name:"",
+                    owner: ""
+                }]
+        }
+
+    }
 
     const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
         defaultValues: { 
-            entities: [{name: defaultValues.name, owner: defaultValues.owner}]
+            entities: getDefaultValues()
             } ,
         resolver: zodResolver(formSchema),
         mode: "onBlur"
         });
     
-    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    const { fields, append } = useFieldArray({
         name: "entities", // unique name for your Field Array
         control, // control props comes from useForm (optional: if you are using FormProvider)
     });
@@ -46,7 +64,6 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
     const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => {        
         onSubmit(
             data.entities as CatalogInfoForm[]
-            
         )
     }
 
@@ -71,6 +88,33 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
                     
                     return (
                     <Flex direction={'column'} justify={"start"} key={field.id}>
+                        {index !== 0 && (
+                           <Divider variant="middle" sx={{my: 4}}/>
+                        )}
+                    <div>
+                        <Controller
+                                name={`entities.${index}.kind`}
+                                control={control}
+                                render={({ 
+                                    field:{ onChange, onBlur } 
+                                }) => (
+                                    <Select
+                                        name="kind"
+                                        label="Entity kind"
+                                        onBlur={onBlur}
+                                        onSelectionChange={onChange}
+                                        options={
+                                            Object.values(AllowedEntityKinds).map(value => ({
+                                                value: value as string,
+                                                label: value,
+                                            }))
+                                        }
+                                        isRequired={index === 0}
+                                        isDisabled={index === 0}
+                                    />)}
+                            />
+                        {errors.entities?.[index]?.kind && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.kind.message}</span>}
+                    </div>
                     <div>
                         <Controller
                             name={`entities.${index}.name`}
@@ -169,10 +213,12 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
 
                     </Flex>
                     )})}
-                    <Button
+                        <Flex direction={'row'} align={'center'} style={{paddingTop: "1rem"}}>
+                            <Button
                             type="button"
                             onClick={() =>
                                 append({
+                                    kind: "Component",
                                     name: "",
                                     owner: "",
                                     lifecycle: "deprecated",
@@ -183,8 +229,6 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
                             >
                             Add Entity
                         </Button>
-
-                        <Flex direction={'row'} align={'center'}>
                             <Button
                                 variant="primary"
                                 type='submit'

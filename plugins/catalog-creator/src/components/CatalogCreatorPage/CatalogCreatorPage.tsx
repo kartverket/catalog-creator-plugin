@@ -154,10 +154,7 @@ export const CatalogCreatorPage = () => {
                 isLoading={isLoading}
                 setIsLoading={setIsLoading}
                 status={status}
-                defaultValues={{
-                  name: response ? response[0].metadata.name : "",
-                  owner: response ? response[0].spec.owner! : "",
-                }}
+                currentYaml={ response }
               />
             )}
           </Card>

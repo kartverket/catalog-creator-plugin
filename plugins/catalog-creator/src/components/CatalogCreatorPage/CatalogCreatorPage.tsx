@@ -47,7 +47,7 @@ export const CatalogCreatorPage = () => {
 
   const emptyRequiredYamlFields: RequiredYamlFields[] = [{
     apiVersion: 'backstage.io/v1alpha1',
-      kind: "Component",
+      kind: "",
       metadata: {
         name: ''
       },
@@ -80,7 +80,7 @@ export const CatalogCreatorPage = () => {
     setIsLoading(true)
       try{
           // old code that works for no catalog-info basic case
-           const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoFormList, githubAuthApi);
+           const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoFormList, githubAuthApi, emptyRequiredYamlFields[0]);
            if (prStatus?.severity == "success") {
             setSubmittedPR(true)
            }
@@ -113,7 +113,7 @@ export const CatalogCreatorPage = () => {
               <Box px={'2rem'}>
                 <Flex direction={"column"} align={{ xs: 'start', md: 'center' }} py={'2rem'}>
                   <Alert sx = {{ fontWeight:'bold'}}severity='success'>Successfully created a pull request </Alert>
-                  <Link onClick={() => setSubmittedPR(false)}>Register a new component?</Link>
+                  <Link onClick={() => { window.location.reload()}}>Register a new component?</Link>
                 </Flex>
               </Box>
             </Card>

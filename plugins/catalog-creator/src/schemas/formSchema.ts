@@ -1,7 +1,7 @@
 import * as z from "zod/v4";
 
 export const entitySchema = z.object({
-    kind: z.enum(["Component", "API", "Template","System", "Domain", "Resource"], { message: "Choose a kind"}),
+    kind: z.enum(["Component", "API", "Template", "System", "Domain", "Resource"], { message: "Choose a kind"}),
     name: z.string().trim().min(1, "Add a name").refine(s => !s.includes(' '), { message: "Name cannot contain space"}).refine(s => !/^[.!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]|[.!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]$/.test(s), 
   'Name cannot start or end with special characters'),
     owner: z.string().trim().min(1, "Add an owner").refine(s => !s.includes(' '), { message: "Owner cannot contain space"}),

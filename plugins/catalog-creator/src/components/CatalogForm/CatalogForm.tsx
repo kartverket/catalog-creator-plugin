@@ -41,6 +41,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
             })
         } else {
              return [{
+                    kind: AllowedEntityKinds.Component,
                     name:"",
                     owner: ""
                 }]
@@ -89,7 +90,10 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                     return (
                     <Flex direction={'column'} justify={"start"} key={field.id}>
                         {index !== 0 && (
+                            <div>
                            <Divider variant="middle" sx={{my: 4}}/>
+                           <h3>Entity</h3>
+                           </div>
                         )}
                     <div>
                         <Controller

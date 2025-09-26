@@ -2,19 +2,16 @@ import { CatalogImportApi } from '@backstage/plugin-catalog-import';
 import type { CatalogInfoForm, RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
-import yaml from 'yaml';
 import { Octokit } from "@octokit/core";
 import { createPullRequest } from "octokit-plugin-create-pull-request";
 import { OAuthApi } from '@backstage/core-plugin-api';
-import { object } from 'zod/v4';
-
 
 export class GithubController {
     constructor(
         private catalogImportApi: CatalogImportApi,
     ) { }
 
-    submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields[], catalogInfo: CatalogInfoForm[], githubAuthApi: OAuthApi ) : Promise<Status | undefined> => {
+    submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields[], catalogInfo: CatalogInfoForm[], githubAuthApi: OAuthApi, emptyRequiredYaml: RequiredYamlFields ) : Promise<Status | undefined> => {
     
         const path = new URL(url).pathname.slice(1)
         
@@ -27,7 +24,7 @@ export class GithubController {
         const yamlStrings = [];
 
         for (let i = 0; i < maxLength; i++) {
-            const initial = initialYaml[i] || {};
+            const initial = initialYaml[i] || emptyRequiredYaml;
             const catalog = catalogInfo[i] || initialYaml[i];
             const merged =  updateYaml(initial, catalog);
 

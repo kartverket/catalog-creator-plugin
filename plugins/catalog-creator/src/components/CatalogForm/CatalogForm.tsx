@@ -9,7 +9,7 @@ import {
 import type { CatalogInfoForm, Status } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, SubmitHandler, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
@@ -26,26 +26,37 @@ export type CatalogFormProps = {
     }
 };
 
+
 export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormProps) => {
 
 
-     const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
+    const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
         defaultValues: { 
-            name: defaultValues.name,
-             owner: defaultValues.owner
+            entities: [{name: defaultValues.name, owner: defaultValues.owner}]
             } ,
         resolver: zodResolver(formSchema),
         mode: "onBlur"
         });
+    
+    const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+        name: "entities", // unique name for your Field Array
+        control, // control props comes from useForm (optional: if you are using FormProvider)
+    });
         
-    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => onSubmit({
-        kind: AllowedEntityKinds.Component,
-        name: data.name,
-        owner: data.owner,
-        lifecycle: (data.lifecycle as AllowedLifecycleStages),
-        type: (data.type as AllowedEntityTypes),
-        system: data.system,
-    })
+    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
+        console.log(data)
+        // onSubmit(
+        //     console.log(data)
+        // //     {
+        //     kind: AllowedEntityKinds.Component,
+        //     name: data?.entity?.name,
+        //     owner: data.owner,
+        //     lifecycle: (data.lifecycle as AllowedLifecycleStages),
+        //     type: (data.type as AllowedEntityTypes),
+        //     system: data.system,
+        // }
+    // )
+    }
 
   
     return (
@@ -64,113 +75,132 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
         <form onSubmit={handleSubmit(submitForm)} >
             <Box px={'2rem'}>
                 <h2>Catalog-info.yaml Form</h2>
-                <Flex direction={'column'} justify={"start"}>
-                <div>
-                    <Controller
-                        name="name"
-                        control={control}
-                        render={({ field }) => (
-                        <TextField
-                                {...field}
-                                name="Name"
-                                label="Entity name"
-                                isRequired
-                            />
-                        )}
-                    />
-                    {errors.name && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.name.message}</span>}
-                </div>
-                <div>
-                    <Controller
-                        name="owner"
-                        control={control}
-                        render={({ field }) => (
-                        <TextField
-                                {...field}
-                                name="Owner"
-                                label="Entity owner"
-                                isRequired
-                            />
-                        )}
-                    />
-                    {errors.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.owner.message}</span>}
-                </div>
-
-                    <Flex>
-                        <div>
-                        <Controller
-                            name="lifecycle"
-                            control={control}
-                            render={({ 
-                                field:{ onChange, onBlur } 
-                            }) => (
-                                <Select
-                                    name="lifecycle"
-                                    label="Entity lifecycle"
-                                    onBlur={onBlur}
-                                    onSelectionChange={onChange}
-                                    options={
-                                        Object.values(AllowedLifecycleStages).map(value => ({
-                                            value: value as string,
-                                            label: value,
-                                        }))
-                                    }
-                                    isRequired
-                                />)}
-                        />
-                         {errors.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.lifecycle.message}</span>}
-                        </div>
-
-                        <div>
-                        <Controller
-                            name="type"
-                            control={control}
-                            render={({ 
-                                field:{ onChange, onBlur } 
-                            }) => (
-                                <Select
-                                    name="type"
-                                    label="Entity type"
-                                    onBlur={onBlur}
-                                    onSelectionChange={onChange}
-                                    options={
-                                        Object.values(AllowedEntityTypes).map(value => ({
-                                            value: value as string,
-                                            label: value,
-                                        }))
-                                    }
-                                    isRequired
-                                />)}
-                        />
-                         {errors.type && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.type.message}</span>}
-                        </div>
-
-                    </Flex>
+                {fields.map((field, index) => {
+                    
+                    return (
+                    <Flex direction={'column'} justify={"start"} key={field.id}>
                     <div>
-                    <Controller
-                        name="system"
-                        control={control}
-                        render={({ field }) => (
-                        <TextField
-                                {...field}
-                                name="System"
-                                label="Entity System"
+                        <Controller
+                            name={`entities.${index}.name`}
+                            control={control}
+                            render={({ field }) => (
+                            <TextField
+                                    {...field}
+                                    name="Name"
+                                    label="Entity name"
+                                    isRequired
+                                />
+                            )}
+                        />
+                        {errors.entities?.[index]?.name && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.name.message}</span>}
+                    </div>
+                    <div>
+                        <Controller
+                            name={`entities.${index}.owner`}
+                            control={control}
+                            render={({ field }) => (
+                            <TextField
+                                    {...field}
+                                    name="Owner"
+                                    label="Entity owner"
+                                    isRequired
+                                />
+                            )}
+                        />
+                        {errors.entities?.[index]?.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.owner.message}</span>}
+                    </div>
+
+                        <Flex>
+                            <div>
+                            <Controller
+                                name={`entities.${index}.lifecycle`}
+                                control={control}
+                                render={({ 
+                                    field:{ onChange, onBlur } 
+                                }) => (
+                                    <Select
+                                        name="lifecycle"
+                                        label="Entity lifecycle"
+                                        onBlur={onBlur}
+                                        onSelectionChange={onChange}
+                                        options={
+                                            Object.values(AllowedLifecycleStages).map(value => ({
+                                                value: value as string,
+                                                label: value,
+                                            }))
+                                        }
+                                        isRequired
+                                    />)}
                             />
-                        )}
-                    />
-                     {errors.system && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.system.message}</span>}
-                     </div>
+                            {errors.entities?.[index]?.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.lifecycle.message}</span>}
+                            </div>
 
-                    <Flex direction={'row'} align={'center'}>
-                        <Button
-                            variant="primary"
-                            type='submit'
-                        >
-                            Create pull request
-                        </Button>
+                            <div>
+                            <Controller
+                                name={`entities.${index}.entityType`}
+                                control={control}
+                                render={({ 
+                                    field:{ onChange, onBlur } 
+                                }) => (
+                                    <Select
+                                        name="type"
+                                        label="Entity type"
+                                        onBlur={onBlur}
+                                        onSelectionChange={onChange}
+                                        options={
+                                            Object.values(AllowedEntityTypes).map(value => ({
+                                                value: value as string,
+                                                label: value,
+                                            }))
+                                        }
+                                        isRequired
+                                    />)}
+                            />
+                            {errors.entities?.[index]?.entityType && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.entityType.message}</span>}
+                            </div>
+
+                        </Flex>
+                        <div>
+                        <Controller
+                            name={`entities.${index}.system`}
+                            control={control}
+                            render={({ field }) => (
+                            <TextField
+                                    {...field}
+                                    name="System"
+                                    label="Entity System"
+                                />
+                            )}
+                        />
+                        {errors.entities?.[index]?.system && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.system.message}</span>}
+                        </div>
+
                     </Flex>
+                    )})}
+                    <Button
+                            type="button"
+                            onClick={() =>
+                                append({
+                                    name: "",
+                                    owner: "",
+                                    lifecycle: "deprecated",
+                                    entityType: "library",
+                                    system: ""
+                                })
+                            }
+                            >
+                            Add Entity
+                        </Button>
 
-                </Flex>
+                        <Flex direction={'row'} align={'center'}>
+                            <Button
+                                variant="primary"
+                                type='submit'
+                            >
+                                Create pull request
+                            </Button>
+                        </Flex>
+                    
             </Box>
         </form>
         }

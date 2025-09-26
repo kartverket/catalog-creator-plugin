@@ -23,7 +23,7 @@ export type CatalogInfoForm = {
     name: string;
     owner: string;
     lifecycle: AllowedLifecycleStages;
-    type: AllowedEntityTypes | null;
+    entityType: AllowedEntityTypes | null;
     system?: string;
     domain?: string;
     providesApis?: string[];

@@ -13,7 +13,7 @@ export class GithubController {
         private catalogImportApi: CatalogImportApi,
     ) { }
 
-    submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields[], catalogInfo: CatalogInfoForm, githubAuthApi: OAuthApi ) : Promise<Status | undefined> => {
+    submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields[], catalogInfo: CatalogInfoForm[], githubAuthApi: OAuthApi ) : Promise<Status | undefined> => {
     
         const path = new URL(url).pathname.slice(1)
         
@@ -22,9 +22,9 @@ export class GithubController {
         const owner = match![1];
         const repo = match![2];
 
-            const yamlContent = [updateYaml(initialYaml[0], catalogInfo), ...initialYaml.slice(1).map((object) => (yaml.stringify(object)))].join("\n---\n");
 
-
+            const yamlContent = [updateYaml(initialYaml[0], catalogInfo[0]), ...initialYaml.slice(1).map((object) => (yaml.stringify(object)))].join("\n---\n");
+            
 
             const OctokitPlugin = Octokit.plugin(createPullRequest);
             const token = await githubAuthApi.getAccessToken(); 

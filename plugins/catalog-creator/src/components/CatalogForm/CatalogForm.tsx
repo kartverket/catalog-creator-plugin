@@ -43,19 +43,11 @@ export const CatalogForm = ({onSubmit, isLoading, defaultValues}: CatalogFormPro
         control, // control props comes from useForm (optional: if you are using FormProvider)
     });
         
-    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => {
-        console.log(data)
-        // onSubmit(
-        //     console.log(data)
-        // //     {
-        //     kind: AllowedEntityKinds.Component,
-        //     name: data?.entity?.name,
-        //     owner: data.owner,
-        //     lifecycle: (data.lifecycle as AllowedLifecycleStages),
-        //     type: (data.type as AllowedEntityTypes),
-        //     system: data.system,
-        // }
-    // )
+    const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => {        
+        onSubmit(
+            data.entities as CatalogInfoForm[]
+            
+        )
     }
 
   

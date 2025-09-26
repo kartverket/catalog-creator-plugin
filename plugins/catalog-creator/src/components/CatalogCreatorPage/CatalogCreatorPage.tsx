@@ -36,7 +36,7 @@ export const CatalogCreatorPage = () => {
   const [submittedPR, setSubmittedPR] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   //List of yaml objects (entities)
-  const [response, setResponse] = useState<RequiredYamlFields[] | null>(null)
+  const [response, setResponse] = useState<RequiredYamlFields[] | null>(null)
   
   //  const data = useGetCatalogInfo("https://github.com/kartverket/kartverket.dev/blob/github-test/catalog-info.yaml")
   // console.log(data)
@@ -76,11 +76,11 @@ export const CatalogCreatorPage = () => {
     }
   };
 
-  const submitGithubRepo = async (catalogInfoForm: CatalogInfoForm) => {
+  const submitGithubRepo = async (catalogInfoFormList: CatalogInfoForm[]) => {
     setIsLoading(true)
       try{
           // old code that works for no catalog-info basic case
-           const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoForm, githubAuthApi);
+           const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoFormList, githubAuthApi);
            if (prStatus?.severity == "success") {
             setSubmittedPR(true)
            }

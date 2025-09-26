@@ -16,7 +16,7 @@ import { CircularProgress } from '@material-ui/core';
 
 // Props type
 export type CatalogFormProps = {
-    onSubmit: (data: CatalogInfoForm) => void;
+    onSubmit: (data: CatalogInfoForm[]) => void;
     isLoading: boolean,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>> 
     status: Status,

@@ -6,6 +6,7 @@ import yaml from 'yaml';
 import { Octokit } from "@octokit/core";
 import { createPullRequest } from "octokit-plugin-create-pull-request";
 import { OAuthApi } from '@backstage/core-plugin-api';
+import { object } from 'zod/v4';
 
 
 export class GithubController {
@@ -22,13 +23,21 @@ export class GithubController {
         const owner = match![1];
         const repo = match![2];
 
+        const maxLength = Math.max(initialYaml.length, catalogInfo.length);
+        const yamlStrings = [];
 
-            const yamlContent = [updateYaml(initialYaml[0], catalogInfo[0]), ...initialYaml.slice(1).map((object) => (yaml.stringify(object)))].join("\n---\n");
-            
+        for (let i = 0; i < maxLength; i++) {
+            const initial = initialYaml[i] || {};
+            const catalog = catalogInfo[i] || initialYaml[i];
+            const merged =  updateYaml(initial, catalog);
 
-            const OctokitPlugin = Octokit.plugin(createPullRequest);
-            const token = await githubAuthApi.getAccessToken(); 
-            const octokit = new OctokitPlugin({ auth: token });
+            yamlStrings.push(merged);
+        }
+        const completeYaml = yamlStrings.join("\n---\n")
+
+        const OctokitPlugin = Octokit.plugin(createPullRequest);
+        const token = await githubAuthApi.getAccessToken(); 
+        const octokit = new OctokitPlugin({ auth: token });
 
             try{
                 await octokit.createPullRequest({
@@ -41,7 +50,7 @@ export class GithubController {
                 changes: [
                     {
                         files: {
-                            [path] : yamlContent
+                            [path] : completeYaml
                         },
                         commit: "New or updated catalog-info.yaml"
                     }

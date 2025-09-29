@@ -49,6 +49,8 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
 
     }
 
+    
+
     const { handleSubmit, formState: { errors }, control} = useForm<z.infer<typeof formSchema>>({
         defaultValues: { 
             entities: getDefaultValues()
@@ -66,8 +68,10 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
         onSubmit(
             data.entities as CatalogInfoForm[]
         )
+
     }
 
+   
   
     return (
         <>
@@ -100,13 +104,14 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                 name={`entities.${index}.kind`}
                                 control={control}
                                 render={({ 
-                                    field:{ onChange, onBlur } 
+                                    field:{ onChange, onBlur, value } 
                                 }) => (
                                     <Select
                                         name="kind"
                                         label="Entity kind"
                                         onBlur={onBlur}
                                         onSelectionChange={onChange}
+                                        defaultSelectedKey={value}
                                         options={
                                             Object.values(AllowedEntityKinds).map(value => ({
                                                 value: value as string,
@@ -149,20 +154,21 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                         />
                         {errors.entities?.[index]?.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.owner.message}</span>}
                     </div>
-
+                        
                         <Flex>
                             <div>
                             <Controller
                                 name={`entities.${index}.lifecycle`}
                                 control={control}
                                 render={({ 
-                                    field:{ onChange, onBlur } 
+                                    field:{ onChange, onBlur, value } 
                                 }) => (
                                     <Select
                                         name="lifecycle"
                                         label="Entity lifecycle"
                                         onBlur={onBlur}
-                                        onSelectionChange={onChange}
+                                        onSelectionChange={onChange} 
+                                        defaultSelectedKey={value}                                   
                                         options={
                                             Object.values(AllowedLifecycleStages).map(value => ({
                                                 value: value as string,
@@ -180,13 +186,14 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                 name={`entities.${index}.entityType`}
                                 control={control}
                                 render={({ 
-                                    field:{ onChange, onBlur } 
+                                    field:{ onChange, onBlur, value } 
                                 }) => (
                                     <Select
                                         name="type"
                                         label="Entity type"
                                         onBlur={onBlur}
                                         onSelectionChange={onChange}
+                                        defaultSelectedKey={value}
                                         options={
                                             Object.values(AllowedEntityTypes).map(value => ({
                                                 value: value as string,

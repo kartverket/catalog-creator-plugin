@@ -13,19 +13,14 @@ export enum AllowedLifecycleStages {
     deprecated = 'deprecated'
 };
 
-export enum AllowedEntityTypes {
-    service = 'service',
-    library = 'library',
-    website = 'website',
-    openapi = 'openapi'
-};
+
 
 export type CatalogInfoForm = {
     kind: AllowedEntityKinds;
     name: string;
     owner: string;
     lifecycle: AllowedLifecycleStages;
-    entityType: AllowedEntityTypes | null;
+    entityType: string | null;
     system?: string;
     domain?: string;
     providesApis?: string[];

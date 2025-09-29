@@ -7,7 +7,7 @@ import {
 } from '@backstage/ui';
 
 import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/types';
-import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds} from '../../model/types';
+import { AllowedLifecycleStages, AllowedEntityKinds} from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { z } from "zod/v4"
@@ -34,7 +34,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                     name: entry.metadata.name,
                     owner: entry.spec.owner,
                     lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
-                    entityType: entry.spec.type as AllowedEntityTypes,
+                    entityType: entry.spec.type as string,
                     system: entry.spec.system,
                 }
             })

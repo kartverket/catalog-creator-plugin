@@ -6,7 +6,7 @@ export const entitySchema = z.object({
   'Name cannot start or end with special characters'),
     owner: z.string().trim().min(1, "Add an owner").refine(s => !s.includes(' '), { message: "Owner cannot contain space"}),
     lifecycle: z.enum(["development", "production", "deprecated"], { message: "Choose a lifecycle"}),
-    entityType: z.enum(["service", "website", "library", "openapi"], { message: "Choose a type"}),
+    entityType: z.string().trim().min(1, "Add a type").refine(s => !s.includes(' '), { message: "Type cannot contain space"}),
     system: z.optional(z.string().trim().refine(s => !s.includes(' '), { message: "System cannot contain space"}))
 })
 

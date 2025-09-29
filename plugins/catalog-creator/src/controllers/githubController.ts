@@ -20,16 +20,10 @@ export class GithubController {
         const owner = match![1];
         const repo = match![2];
 
-        const maxLength = Math.max(initialYaml.length, catalogInfo.length);
-        const yamlStrings = [];
+        const yamlStrings = catalogInfo.map((val, index) => 
+            updateYaml(initialYaml[index] ?? emptyRequiredYaml, val)
+        )
 
-        for (let i = 0; i < maxLength; i++) {
-            const initial = initialYaml[i] || emptyRequiredYaml;
-            const catalog = catalogInfo[i] || initialYaml[i];
-            const merged =  updateYaml(initial, catalog);
-
-            yamlStrings.push(merged);
-        }
         const completeYaml = yamlStrings.join("\n---\n")
 
         const OctokitPlugin = Octokit.plugin(createPullRequest);

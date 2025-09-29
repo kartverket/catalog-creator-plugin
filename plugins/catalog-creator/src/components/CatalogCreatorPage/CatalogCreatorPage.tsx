@@ -35,11 +35,8 @@ export const CatalogCreatorPage = () => {
   const [status, setStatus] = useState<Status | undefined>();
   const [submittedPR, setSubmittedPR] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  //List of yaml objects (entities)
   const [response, setResponse] = useState<RequiredYamlFields[] | null>(null)
   
-  //  const data = useGetCatalogInfo("https://github.com/kartverket/kartverket.dev/blob/github-test/catalog-info.yaml")
-  // console.log(data)
 
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubAuthApi : OAuthApi = useApi(githubAuthApiRef);

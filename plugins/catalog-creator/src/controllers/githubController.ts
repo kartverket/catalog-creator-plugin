@@ -78,7 +78,7 @@ export class GithubController {
             const analysisResult = await this.catalogImportApi.analyzeUrl(url)
             if (analysisResult.type == "locations") {
                 return {
-                    message: "Catalog-info.yaml already exists",
+                    message: "Catalog-info.yaml found, editing existing file",
                     severity: "info",
                     url: analysisResult.locations[0].target
                 }

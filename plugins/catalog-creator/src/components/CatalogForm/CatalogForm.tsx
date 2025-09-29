@@ -14,6 +14,7 @@ import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
 import Divider from '@mui/material/Divider';
+import { CatalogSearch } from '../CatalogSearch';
 
 // Props type
 export type CatalogFormProps = {
@@ -26,6 +27,7 @@ export type CatalogFormProps = {
 
 
 export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps) => {
+    
 
     const getDefaultValues = () => {
         if (currentYaml) {
@@ -34,7 +36,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                     kind: entry.kind as AllowedEntityKinds,
                     name: entry.metadata.name,
                     owner: entry.spec.owner,
-                    lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
+                    lifecycle: entry.spec.lifecycle as AllowedLifecycleStages | undefined,
                     entityType: entry.spec.type as AllowedEntityTypes,
                     system: entry.spec.system,
                 }
@@ -71,7 +73,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
 
     }
 
-   
+   console.log(fields)
   
     return (
         <>
@@ -111,7 +113,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                         label="Entity kind"
                                         onBlur={onBlur}
                                         onSelectionChange={onChange}
-                                        defaultSelectedKey={value}
+                                        selectedKey={value}
                                         options={
                                             Object.values(AllowedEntityKinds).map(value => ({
                                                 value: value as string,
@@ -140,16 +142,22 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                         {errors.entities?.[index]?.name && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.name.message}</span>}
                     </div>
                     <div>
+                        
                         <Controller
                             name={`entities.${index}.owner`}
                             control={control}
-                            render={({ field }) => (
-                            <TextField
-                                    {...field}
-                                    name="Owner"
-                                    label="Entity owner"
-                                    isRequired
+                            render={({ 
+                                    field:{ onChange, onBlur, value } 
+                                }) => (
+                            <>
+                                <CatalogSearch
+                                    value={value}
+                                    onChange={onChange} 
+                                    onBlur={onBlur}
+                                    label="Owner"
+                                    filter={['user', 'group']}
                                 />
+                            </>
                             )}
                         />
                         {errors.entities?.[index]?.owner && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.owner.message}</span>}
@@ -162,13 +170,14 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                 control={control}
                                 render={({ 
                                     field:{ onChange, onBlur, value } 
-                                }) => (
-                                    <Select
+                                }) => {
+                                    console.log(value)
+                                    return(<Select
                                         name="lifecycle"
                                         label="Entity lifecycle"
                                         onBlur={onBlur}
                                         onSelectionChange={onChange} 
-                                        defaultSelectedKey={value}                                   
+                                        selectedKey={value}                                   
                                         options={
                                             Object.values(AllowedLifecycleStages).map(value => ({
                                                 value: value as string,
@@ -176,7 +185,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                             }))
                                         }
                                         isRequired
-                                    />)}
+                                    />)}}
                             />
                             {errors.entities?.[index]?.lifecycle && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.lifecycle.message}</span>}
                             </div>
@@ -232,7 +241,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                                     kind: "Component",
                                     name: "",
                                     owner: "",
-                                    lifecycle: "deprecated",
+                                    lifecycle: "production",
                                     entityType: "library",
                                     system: ""
                                 })

@@ -83,6 +83,7 @@ export const CatalogCreatorPage = () => {
            const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoFormList, githubAuthApi, emptyRequiredYamlFields[0]);
            if (prStatus?.severity == "success") {
             setSubmittedPR(true)
+
            }
            setStatus(prStatus)
         }
@@ -100,6 +101,14 @@ export const CatalogCreatorPage = () => {
       setIsLoading(false)
   };
 
+  const resetForm = () => {
+    setResponse(null)
+    setStatus(undefined)
+    setUrl('')
+    setSubmittedPR(false)
+  }
+
+
   return (
     <Page themeId="tool">
       <Content>
@@ -113,7 +122,7 @@ export const CatalogCreatorPage = () => {
               <Box px={'2rem'}>
                 <Flex direction={"column"} align={{ xs: 'start', md: 'center' }} py={'2rem'}>
                   <Alert sx = {{ fontWeight:'bold'}}severity='success'>Successfully created a pull request </Alert>
-                  <Link onClick={() => { window.location.reload()}}>Register a new component?</Link>
+                  <Link onClick={() => {resetForm() }}>Register a new component?</Link>
                 </Flex>
               </Box>
             </Card>

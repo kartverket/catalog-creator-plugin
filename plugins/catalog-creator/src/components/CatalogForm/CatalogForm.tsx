@@ -184,23 +184,14 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                             <Controller
                                 name={`entities.${index}.entityType`}
                                 control={control}
-                                render={({ 
-                                    field:{ onChange, onBlur, value } 
-                                }) => (
-                                    <Select
-                                        name="type"
-                                        label="Entity type"
-                                        onBlur={onBlur}
-                                        onSelectionChange={onChange}
-                                        defaultSelectedKey={value}
-                                        options={
-                                            Object.values(AllowedEntityTypes).map(value => ({
-                                                value: value as string,
-                                                label: value,
-                                            }))
-                                        }
-                                        isRequired
-                                    />)}
+                                render={({ field }) => (
+                                    <TextField
+                                            {...field}
+                                            name="Entity type"
+                                            label="Entity type"
+                                        />
+                                    )}
+                                    
                             />
                             {errors.entities?.[index]?.entityType && <span style={{ color: 'red', fontSize: '0.75rem'}}>{errors.entities?.[index]?.entityType.message}</span>}
                             </div>

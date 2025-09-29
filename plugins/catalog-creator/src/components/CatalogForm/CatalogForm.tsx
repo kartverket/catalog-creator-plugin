@@ -15,7 +15,6 @@ import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
 import Divider from '@mui/material/Divider';
 
-// Props type
 export type CatalogFormProps = {
     onSubmit: (data: CatalogInfoForm[]) => void;
     isLoading: boolean,
@@ -60,8 +59,8 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
         });
     
     const { fields, append } = useFieldArray({
-        name: "entities", // unique name for your Field Array
-        control, // control props comes from useForm (optional: if you are using FormProvider)
+        name: "entities", 
+        control,
     });
         
     const submitForm: SubmitHandler<z.infer<typeof formSchema>> = (data) => {        

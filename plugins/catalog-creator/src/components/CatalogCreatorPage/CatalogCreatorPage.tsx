@@ -35,11 +35,7 @@ export const CatalogCreatorPage = () => {
   const [status, setStatus] = useState<Status | undefined>();
   const [submittedPR, setSubmittedPR] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  //List of yaml objects (entities)
   const [response, setResponse] = useState<RequiredYamlFields[] | null>(null)
-  
-  //  const data = useGetCatalogInfo("https://github.com/kartverket/kartverket.dev/blob/github-test/catalog-info.yaml")
-  // console.log(data)
 
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubAuthApi : OAuthApi = useApi(githubAuthApiRef);
@@ -79,10 +75,10 @@ export const CatalogCreatorPage = () => {
   const submitGithubRepo = async (catalogInfoFormList: CatalogInfoForm[]) => {
     setIsLoading(true)
       try{
-          // old code that works for no catalog-info basic case
            const prStatus: Status | undefined = await githubController.submitCatalogInfoToGithub(url, response ? response : emptyRequiredYamlFields, catalogInfoFormList, githubAuthApi, emptyRequiredYamlFields[0]);
            if (prStatus?.severity == "success") {
             setSubmittedPR(true)
+
            }
            setStatus(prStatus)
         }
@@ -100,6 +96,14 @@ export const CatalogCreatorPage = () => {
       setIsLoading(false)
   };
 
+  const resetForm = () => {
+    setResponse(null)
+    setStatus(undefined)
+    setUrl('')
+    setSubmittedPR(false)
+  }
+
+
   return (
     <Page themeId="tool">
       <Content>
@@ -113,7 +117,7 @@ export const CatalogCreatorPage = () => {
               <Box px={'2rem'}>
                 <Flex direction={"column"} align={{ xs: 'start', md: 'center' }} py={'2rem'}>
                   <Alert sx = {{ fontWeight:'bold'}}severity='success'>Successfully created a pull request </Alert>
-                  <Link onClick={() => { window.location.reload()}}>Register a new component?</Link>
+                  <Link onClick={() => {resetForm() }}>Register a new component?</Link>
                 </Flex>
               </Box>
             </Card>

@@ -201,11 +201,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
               </Flex>
             );
           })}
-          <Flex
-            direction="row"
-            align="center"
-            style={{ paddingTop: '1rem' }}
-          >
+          <Flex direction="row" align="center" style={{ paddingTop: '1rem' }}>
             <Button
               type="button"
               onClick={() =>

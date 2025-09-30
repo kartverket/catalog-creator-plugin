@@ -66,7 +66,7 @@ export class GithubController {
       };
     } catch (error : unknown) {
       if (error instanceof Error) {
-        error.message = "Could not create a pull request, it may already exist."
+        error.message = "Could not create a pull request. Make sure the URL is a github repo and that a pull request does not already exist."
         throw error
       } else {
         throw new Error("Unkown error when trying to create a PR.")

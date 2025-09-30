@@ -37,8 +37,8 @@ export const CatalogCreatorPage = () => {
   const githubController = new GithubController();
   const [catalogInfoState, doFetchCatalogInfo] = useAsyncFn(
     async catalogUrl => {
+
        const analysisResult = await catalogImportApi.analyzeUrl(catalogUrl);
-      
       let response: RequiredYamlFields[] | null = null;
       if (analysisResult.type === 'locations') {
         response = await getCatalogInfo(analysisResult.locations[0].target, githubAuthApi);

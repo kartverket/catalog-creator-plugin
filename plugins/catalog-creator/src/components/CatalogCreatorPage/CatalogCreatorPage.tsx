@@ -50,13 +50,16 @@ export const CatalogCreatorPage = () => {
   }, [url, githubAuthApi, catalogImportApi.analyzeUrl, doFetchCatalogInfo]);
 
   const [repoState, doSubmitToGithub] = useAsyncFn(
-    (catalogInfoFormList: CatalogInfoForm[]) => {
-      return githubController.submitCatalogInfoToGithub(
-        url,
-        catalogInfoState.value || [],
-        catalogInfoFormList,
-        githubAuthApi,
-      );
+    async (catalogInfoFormList?: CatalogInfoForm[]) => {
+      if (catalogInfoFormList !== undefined) {
+        return await githubController.submitCatalogInfoToGithub(
+          url,
+          catalogInfoState.value || [],
+          catalogInfoFormList,
+          githubAuthApi,
+        );
+      }
+      return undefined;
     },
     [
       githubController.submitCatalogInfoToGithub,
@@ -88,6 +91,7 @@ export const CatalogCreatorPage = () => {
                   <Link
                     onClick={() => {
                       setUrl('');
+                      doSubmitToGithub(undefined);
                     }}
                   >
                     Register a new component?
@@ -101,6 +105,7 @@ export const CatalogCreatorPage = () => {
                 onSubmit={e => {
                   e.preventDefault();
                   doAnalyzeUrl();
+                  doSubmitToGithub(undefined);
                 }}
               >
                 <Box px="2rem">

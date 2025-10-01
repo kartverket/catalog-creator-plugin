@@ -7,7 +7,7 @@ export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): 
 
     const updated: RequiredYamlFields = {
         ...initial,
-        kind: form.kind || initial.kind,
+        kind: form.kind || initial.kind,
         metadata: {
             ...initial.metadata,
             name: form.name || initial.metadata.name,

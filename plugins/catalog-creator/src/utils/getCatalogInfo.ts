@@ -1,5 +1,5 @@
 import { OAuthApi} from "@backstage/core-plugin-api"
-import { Octokit } from "@octokit/rest";
+import { Octokit } from '@octokit/rest';
 import * as yaml from 'yaml';
 import { RequiredYamlFields } from "../model/types";
 
@@ -41,8 +41,8 @@ export async function getCatalogInfo(url: string, githubAuthApi: OAuthApi) : Pro
     } catch (error: unknown) {
         if (error instanceof Error) {
             return null
-        } else {
+        } 
             throw error;
-        }
+        
     }
  }

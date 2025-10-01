@@ -2,8 +2,8 @@ import { CatalogImportApi } from '@backstage/plugin-catalog-import';
 import type { CatalogInfoForm, RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
-import { Octokit } from "@octokit/core";
-import { createPullRequest } from "octokit-plugin-create-pull-request";
+import { Octokit } from '@octokit/core';
+import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import { OAuthApi } from '@backstage/core-plugin-api';
 
 export class GithubController {
@@ -64,9 +64,9 @@ export class GithubController {
                         message: "Failed to create pull request, it may already exist.",
                         severity: "error",
                     }
-                } else{
+                } 
                     throw new Error("Unexpected error")
-            }
+            
         }
             
             
@@ -76,13 +76,13 @@ export class GithubController {
   
         try {
             const analysisResult = await this.catalogImportApi.analyzeUrl(url)
-            if (analysisResult.type == "locations") {
+            if (analysisResult.type === "locations") {
                 return {
                     message: "Catalog-info.yaml found, editing existing file",
                     severity: "info",
                     url: analysisResult.locations[0].target
                 }
-            } else if (analysisResult.type == "repository") {
+            } else if (analysisResult.type === "repository") {
                 return {
                     message: "Found repository",
                     severity: "success",
@@ -94,9 +94,9 @@ export class GithubController {
                     message: error.message,
                     severity: "error",
                 }
-            } else{
+            } 
                 throw new Error("Unexpected error")
-            }
+            
         }
         return undefined
     }

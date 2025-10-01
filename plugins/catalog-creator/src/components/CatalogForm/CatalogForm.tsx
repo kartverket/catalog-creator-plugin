@@ -9,7 +9,7 @@ import {
 import type { CatalogInfoForm, RequiredYamlFields, Status } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityTypes, AllowedEntityKinds} from '../../model/types';
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Controller, SubmitHandler, useFieldArray, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { z } from "zod/v4"
 import { formSchema } from '../../schemas/formSchema';
 import { CircularProgress } from '@material-ui/core';
@@ -41,13 +41,13 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
                     system: entry.spec.system,
                 }
             })
-        } else {
+        } 
              return [{
                     kind: AllowedEntityKinds.Component,
                     name:"",
                     owner: ""
                 }]
-        }
+        
 
     }
 
@@ -73,7 +73,6 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
 
     }
 
-   console.log(fields)
   
     return (
         <>
@@ -89,12 +88,12 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
         </div>
         :
         <form onSubmit={handleSubmit(submitForm)} >
-            <Box px={'2rem'}>
+            <Box px="2rem">
                 <h2>Catalog-info.yaml Form</h2>
                 {fields.map((field, index) => {
                     
                     return (
-                    <Flex direction={'column'} justify={"start"} key={field.id}>
+                    <Flex direction="column" justify="start" key={field.id}>
                         {index !== 0 && (
                             <div>
                            <Divider variant="middle" sx={{my: 4}}/>
@@ -233,7 +232,7 @@ export const CatalogForm = ({onSubmit, isLoading, currentYaml}: CatalogFormProps
 
                     </Flex>
                     )})}
-                        <Flex direction={'row'} align={'center'} style={{paddingTop: "1rem"}}>
+                        <Flex direction="row" align="center" style={{paddingTop: "1rem"}}>
                             <Button
                             type="button"
                             onClick={() =>

@@ -29,14 +29,25 @@ export const CatalogCreatorPage = () => {
 
   const [url, setUrl] = useState('');
 
-  const [catalogInfoState, doFetchCatalogInfo] = useAsyncFn(getCatalogInfo);
+  const [catalogInfoState, doFetchCatalogInfo] = useAsyncFn(
+    async (catInfoUrl: string | null) => {
+      if (catInfoUrl === null) {
+        return null;
+      }
+      return await getCatalogInfo(catInfoUrl, githubAuthApi);
+    },
+    [url, githubAuthApi],
+  );
 
   const [analysisResult, doAnalyzeUrl] = useAsyncFn(async () => {
     const result = await catalogImportApi.analyzeUrl(url);
-    if (result.type === 'locations')
-      doFetchCatalogInfo(result.locations[0].target, githubAuthApi);
+    if (result.type === 'locations') {
+      doFetchCatalogInfo(result.locations[0].target);
+    } else {
+      doFetchCatalogInfo(null);
+    }
     return result;
-  }, [url, githubAuthApi]);
+  }, [url, githubAuthApi, catalogImportApi.analyzeUrl, doFetchCatalogInfo]);
 
   const [repoState, doSubmitToGithub] = useAsyncFn(
     (catalogInfoFormList: CatalogInfoForm[]) => {
@@ -47,7 +58,12 @@ export const CatalogCreatorPage = () => {
         githubAuthApi,
       );
     },
-    [githubAuthApi, catalogInfoState.value, url],
+    [
+      githubController.submitCatalogInfoToGithub,
+      githubAuthApi,
+      catalogInfoState.value,
+      url,
+    ],
   );
 
   return (
@@ -142,7 +158,7 @@ export const CatalogCreatorPage = () => {
                 </div>
               ) : (
                 <div>
-                  {catalogInfoState.value && (
+                  {catalogInfoState.value !== undefined && (
                     <CatalogForm
                       onSubmit={doSubmitToGithub}
                       currentYaml={catalogInfoState.value}

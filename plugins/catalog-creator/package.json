@@ -33,7 +33,6 @@
     "@backstage/core-components": "^0.17.1",
     "@backstage/core-plugin-api": "^1.10.5",
     "@backstage/plugin-catalog-import": "backstage:^",
-    "@backstage/plugin-catalog-react": "backstage:^",
     "@backstage/theme": "^0.6.5",
     "@backstage/ui": "backstage:^",
     "@hookform/resolvers": "^5.2.2",

@@ -2,6 +2,7 @@ import * as z from 'zod/v4';
 import { AllowedEntityKinds, AllowedLifecycleStages } from '../model/types';
 
 export const entitySchema = z.object({
+  id: z.number(),
   kind: z.enum(AllowedEntityKinds, { message: 'Choose a kind' }),
   name: z
     .string()

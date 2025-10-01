@@ -14,6 +14,7 @@ export enum AllowedLifecycleStages {
 }
 
 export type CatalogInfoForm = {
+  id: number;
   kind: AllowedEntityKinds;
   name: string;
   owner: string;

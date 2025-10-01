@@ -2,16 +2,16 @@ import { useApi } from '@backstage/core-plugin-api';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { useEffect, useState } from 'react';
 
-import { UserEntity } from '@backstage/catalog-model';
-import { SearchField, Avatar } from '@backstage/ui';
-import { List, ListItemAvatar, ListItemText, Paper } from '@material-ui/core';
+import { Entity } from '@backstage/catalog-model';
+import { SearchField, Text } from '@backstage/ui';
+import { List, ListItemText, Paper } from '@material-ui/core';
 import ListItemButton from '@mui/material/ListItemButton';
 
-interface OwnerSearchProps {
+interface CatalogSearchProps {
   value?: string;
   onChange: (owner: string | null) => void;
   onBlur?: () => void;
-  filter: string[];
+  filter: string;
   label: string;
 }
 
@@ -21,9 +21,10 @@ export const CatalogSearch = ({
   filter,
   onBlur,
   label,
-}: OwnerSearchProps) => {
-  const [owners, setOwners] = useState<UserEntity[]>([]);
-  const [searchQuery, setSearchQuery] = useState(value || '');
+}: CatalogSearchProps) => {
+  const [entity, setEntity] = useState<Entity[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const catalogApi = useApi(catalogApiRef);
 
@@ -34,52 +35,45 @@ export const CatalogSearch = ({
           kind: filter,
         },
       });
-      setOwners(results.items as UserEntity[]);
+
+      setEntity(results.items as Entity[]);
     };
     fetchUsers();
   }, [catalogApi, filter]);
 
-  const filteredUsers = owners.filter(owner => {
-    const email = owner?.spec.profile?.email?.toLowerCase() || '';
-    const displayName = owner.spec?.profile?.displayName?.toLowerCase() || '';
-    return (
-      email.includes(searchQuery.toLowerCase()) ||
-      displayName.includes(searchQuery.toLowerCase())
-    );
+  const filteredUsers = entity.filter(owner => {
+    const displayName = owner.metadata.name || '';
+    return displayName.includes(searchQuery.toLowerCase());
   });
 
   return (
     <div>
       <p>{label}</p>
-      <div onBlur={onBlur}>
+      <div>
         <SearchField
           placeholder="Search..."
-          onChange={input => setSearchQuery(input)}
           value={searchQuery}
+          onChange={input => {
+            setSearchQuery(input);
+            setShowDropdown(true);
+          }}
           onBlur={onBlur}
+          onSelect={() => setShowDropdown(true)}
         />
       </div>
-      {searchQuery && searchQuery !== value ? (
+      {showDropdown && searchQuery && filteredUsers.length > 0 ? (
         <Paper style={{ maxHeight: 300, overflow: 'auto', margin: '2px' }}>
           <List>
             {filteredUsers.map((owner, idx) => (
               <ListItemButton
                 key={idx}
                 onClick={() => {
+                  setSearchQuery('');
+                  setShowDropdown(false);
                   onChange(owner.metadata.name);
-                  setSearchQuery(owner.metadata.name);
                 }}
               >
-                <ListItemAvatar>
-                  <Avatar
-                    src={owner?.spec.profile?.picture!}
-                    name={owner?.spec?.profile?.displayName!}
-                  />
-                </ListItemAvatar>
-                <ListItemText
-                  primary={owner?.spec?.profile?.displayName}
-                  secondary={owner?.spec.profile?.email}
-                />
+                <ListItemText primary={owner.metadata.name} />
               </ListItemButton>
             ))}
           </List>
@@ -87,6 +81,10 @@ export const CatalogSearch = ({
       ) : (
         <></>
       )}
+
+      <Text>
+        Selected: <b>{value || 'none'}</b>
+      </Text>
     </div>
   );
 };

@@ -1,9 +1,10 @@
-import type { CatalogInfoForm, RequiredYamlFields } from '../model/types.ts';
+import type { RequiredYamlFields } from '../model/types.ts';
 import yaml from 'yaml';
+import { FormEntity } from '../schemas/formSchema.ts';
 
 export const updateYaml = (
   initial: RequiredYamlFields,
-  form: CatalogInfoForm,
+  form: FormEntity,
 ): string => {
   const updated: RequiredYamlFields = {
     ...initial,
@@ -19,21 +20,6 @@ export const updateYaml = (
       system: form.system?.length
         ? form.system
         : initial.spec.system || undefined,
-      domain: form.domain?.length
-        ? form.domain
-        : initial.spec.domain || undefined,
-      providesApis: form.providesApis?.length
-        ? form.providesApis
-        : initial.spec.providesApis || undefined,
-      consumesApis: form.consumesApis?.length
-        ? form.consumesApis
-        : initial.spec.consumesApis || undefined,
-      dependsOn: form.dependsOn?.length
-        ? form.dependsOn
-        : initial.spec.dependsOn || undefined,
-      definition: form.definition?.length
-        ? form.definition
-        : initial.spec.definition || undefined,
       type: form.entityType! || initial.spec.type,
     },
   };

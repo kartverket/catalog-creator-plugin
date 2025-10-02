@@ -1,19 +1,16 @@
-import type {
-  CatalogInfoForm,
-  RequiredYamlFields,
-  Status,
-} from '../model/types.ts';
+import type { RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
 import { Octokit } from '@octokit/core';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import { OAuthApi } from '@backstage/core-plugin-api';
+import { FormEntity } from '../schemas/formSchema.ts';
 
 export class GithubController {
   submitCatalogInfoToGithub = async (
     url: string,
     initialYaml: RequiredYamlFields[],
-    catalogInfo: CatalogInfoForm[],
+    catalogInfo: FormEntity[],
     githubAuthApi: OAuthApi,
   ): Promise<Status | undefined> => {
     const path = new URL(url).pathname.slice(1);

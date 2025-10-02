@@ -13,21 +13,6 @@ export enum AllowedLifecycleStages {
   deprecated = 'deprecated',
 }
 
-export type CatalogInfoForm = {
-  id: number;
-  kind: AllowedEntityKinds;
-  name: string;
-  owner: string;
-  lifecycle: AllowedLifecycleStages;
-  entityType: string | null;
-  system?: string;
-  domain?: string;
-  providesApis?: string[];
-  consumesApis?: string[];
-  dependsOn?: string[];
-  definition?: string[];
-};
-
 export type Status = {
   message: string;
   severity: 'error' | 'success' | 'warning' | 'info';

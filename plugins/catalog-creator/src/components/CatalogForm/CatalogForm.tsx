@@ -11,17 +11,16 @@ import {
 import {
   AllowedEntityKinds,
   AllowedLifecycleStages,
-  type CatalogInfoForm,
   type RequiredYamlFields,
 } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
-import { formSchema } from '../../schemas/formSchema';
+import { FormEntity, formSchema } from '../../schemas/formSchema';
 import { useState } from 'react';
 
 export type CatalogFormProps = {
-  onSubmit: (data: CatalogInfoForm[]) => void;
+  onSubmit: (data: FormEntity[]) => void;
   currentYaml: RequiredYamlFields[] | null;
 };
 
@@ -68,7 +67,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     <>
       <form
         onSubmit={handleSubmit(data => {
-          onSubmit(data.entities as CatalogInfoForm[]);
+          onSubmit(data.entities as FormEntity[]);
         })}
       >
         <Box px="2rem">

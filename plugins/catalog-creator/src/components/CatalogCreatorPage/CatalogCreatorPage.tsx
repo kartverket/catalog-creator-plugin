@@ -14,7 +14,6 @@ import {
   catalogImportApiRef,
 } from '@backstage/plugin-catalog-import';
 
-import type { CatalogInfoForm } from '../../model/types';
 import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
@@ -24,6 +23,7 @@ import { useAsyncFn } from 'react-use';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useState } from 'react';
+import { FormEntity } from '../../schemas/formSchema';
 
 export const CatalogCreatorPage = () => {
   const catalogImportApi = useApi(catalogImportApiRef);
@@ -53,7 +53,7 @@ export const CatalogCreatorPage = () => {
   }, [url, githubAuthApi, catalogImportApi.analyzeUrl, doFetchCatalogInfo]);
 
   const [repoState, doSubmitToGithub] = useAsyncFn(
-    async (submitUrl: string, catalogInfoFormList?: CatalogInfoForm[]) => {
+    async (submitUrl: string, catalogInfoFormList?: FormEntity[]) => {
       if (catalogInfoFormList !== undefined) {
         return await githubController.submitCatalogInfoToGithub(
           submitUrl,

@@ -37,6 +37,8 @@ export const entitySchema = z.object({
   ),
 });
 
+export type FormEntity = z.infer<typeof entitySchema>;
+
 export const formSchema = z.object({
   entities: z.array(entitySchema).min(1, 'At least one entity is required'),
 });

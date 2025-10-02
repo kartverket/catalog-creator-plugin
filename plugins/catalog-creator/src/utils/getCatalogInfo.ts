@@ -7,7 +7,9 @@ export async function getCatalogInfo(
   url: string,
   githubAuthApi: OAuthApi,
 ): Promise<RequiredYamlFields[] | null> {
-  const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)\/(?:blob|tree)\/([^\/]+)\/(.+)/);
+  const match = url.match(
+    /github\.com\/([^\/]+)\/([^\/]+)\/(?:blob|tree)\/([^\/]+)\/(.+)/,
+  );
 
   if (!match) {
     throw new Error('Invalid GitHub repository URL');
@@ -15,7 +17,7 @@ export async function getCatalogInfo(
 
   const owner = match[1];
   const repo = match[2];
-  const ref = match[3]; 
+  const ref = match[3];
   const path = match[4];
 
   try {
@@ -27,7 +29,7 @@ export async function getCatalogInfo(
       owner: owner,
       repo: repo,
       path: path,
-      ref: ref
+      ref: ref,
     });
 
     const fileContent = Buffer.from(
@@ -41,9 +43,11 @@ export async function getCatalogInfo(
     return documentList;
   } catch (error: unknown) {
     if (error instanceof Error) {
+      if (error.message.toLowerCase().includes('credentials')) {
+        throw error;
+      }
       return null;
-    } 
-      throw error;
-    
+    }
+    throw error;
   }
 }

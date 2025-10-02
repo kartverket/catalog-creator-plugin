@@ -9,7 +9,10 @@ import {
 
 import { githubAuthApiRef, OAuthApi, useApi } from '@backstage/core-plugin-api';
 
-import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
+import {
+  AnalyzeResult,
+  catalogImportApiRef,
+} from '@backstage/plugin-catalog-import';
 
 import type { CatalogInfoForm } from '../../model/types';
 import { CatalogForm } from '../CatalogForm';
@@ -50,10 +53,10 @@ export const CatalogCreatorPage = () => {
   }, [url, githubAuthApi, catalogImportApi.analyzeUrl, doFetchCatalogInfo]);
 
   const [repoState, doSubmitToGithub] = useAsyncFn(
-    async (catalogInfoFormList?: CatalogInfoForm[]) => {
+    async (submitUrl: string, catalogInfoFormList?: CatalogInfoForm[]) => {
       if (catalogInfoFormList !== undefined) {
         return await githubController.submitCatalogInfoToGithub(
-          url,
+          submitUrl,
           catalogInfoState.value || [],
           catalogInfoFormList,
           githubAuthApi,
@@ -65,7 +68,6 @@ export const CatalogCreatorPage = () => {
       githubController.submitCatalogInfoToGithub,
       githubAuthApi,
       catalogInfoState.value,
-      url,
     ],
   );
 
@@ -91,7 +93,7 @@ export const CatalogCreatorPage = () => {
                   <Link
                     onClick={() => {
                       setUrl('');
-                      doSubmitToGithub(undefined);
+                      doSubmitToGithub('', undefined);
                     }}
                   >
                     Register a new component?
@@ -105,7 +107,7 @@ export const CatalogCreatorPage = () => {
                 onSubmit={e => {
                   e.preventDefault();
                   doAnalyzeUrl();
-                  doSubmitToGithub(undefined);
+                  doSubmitToGithub('', undefined);
                 }}
               >
                 <Box px="2rem">
@@ -163,12 +165,18 @@ export const CatalogCreatorPage = () => {
                 </div>
               ) : (
                 <div>
-                  {catalogInfoState.value !== undefined && (
-                    <CatalogForm
-                      onSubmit={doSubmitToGithub}
-                      currentYaml={catalogInfoState.value}
-                    />
-                  )}
+                  {catalogInfoState.value !== undefined &&
+                    analysisResult.value !== undefined && (
+                      <CatalogForm
+                        onSubmit={data =>
+                          doSubmitToGithub(
+                            getSubmitUrl(analysisResult.value),
+                            data,
+                          )
+                        }
+                        currentYaml={catalogInfoState.value}
+                      />
+                    )}
                 </div>
               )}
             </Card>
@@ -178,3 +186,10 @@ export const CatalogCreatorPage = () => {
     </Page>
   );
 };
+
+function getSubmitUrl(analysisResult: AnalyzeResult) {
+  if (analysisResult.type === 'locations') {
+    return analysisResult.locations[0].target;
+  }
+  return analysisResult.url;
+}

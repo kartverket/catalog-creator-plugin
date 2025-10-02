@@ -67,6 +67,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
 
   const { fields, append, remove } = useFieldArray({
     name: 'entities',
+    keyName: 'key',
     control,
   });
 
@@ -88,7 +89,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   padding: '1rem',
                 }}
               >
-                <Flex direction="column" justify="start" key={entity.id}>
+                <Flex direction="column" justify="start" key={entity.key}>
                   <Flex justify="between">
                     <div>
                       <Controller

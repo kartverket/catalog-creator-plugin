@@ -26,14 +26,6 @@ export type CatalogFormProps = {
 };
 
 export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
-  const [indexCount, setIndexCount] = useState<number>(
-    currentYaml ? currentYaml.length : 0,
-  );
-
-  const incrementIndex = () => {
-    setIndexCount(prev => prev + 1);
-  };
-
   const {
     handleSubmit,
     formState: { errors },
@@ -70,6 +62,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     keyName: 'key',
     control,
   });
+  const [indexCount, setIndexCount] = useState(fields.length);
 
   return (
     <>
@@ -241,7 +234,6 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             <Button
               type="button"
               onClick={() => {
-                incrementIndex();
                 append({
                   id: indexCount,
                   kind: AllowedEntityKinds.Component,
@@ -251,6 +243,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   entityType: '',
                   system: '',
                 });
+                setIndexCount(prev => prev + 1);
               }}
             >
               Add Entity

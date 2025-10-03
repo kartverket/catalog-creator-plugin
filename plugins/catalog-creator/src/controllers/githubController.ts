@@ -1,68 +1,73 @@
-import { CatalogImportApi } from '@backstage/plugin-catalog-import';
-import type { CatalogInfoForm, RequiredYamlFields, Status } from '../model/types.ts';
+import type { RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
+import { Octokit } from '@octokit/core';
+import { createPullRequest } from 'octokit-plugin-create-pull-request';
+import { OAuthApi } from '@backstage/core-plugin-api';
+import { FormEntity } from '../schemas/formSchema.ts';
 
 export class GithubController {
-    constructor(
-        private catalogImportApi: CatalogImportApi,
-    ) { }
+  submitCatalogInfoToGithub = async (
+    url: string,
+    initialYaml: RequiredYamlFields[],
+    catalogInfo: FormEntity[],
+    githubAuthApi: OAuthApi,
+  ): Promise<Status | undefined> => {
+    const path = new URL(url).pathname.slice(1);
 
-    submitCatalogInfoToGithub = async (url: string, initialYaml: RequiredYamlFields, catalogInfo: CatalogInfoForm) => {
-        if (url === '') {
-            console.log('No GitHub repository URL specified');
-            return;
-        }
-
-        
-            
-
-            const yamlContent = updateYaml(initialYaml, catalogInfo);
-
-            // Use api to get default commit message + title, handle possibly missing method
-            const { title, body } = await (this.catalogImportApi.preparePullRequest?.() ?? Promise.resolve({
-                title: 'Add catalog-info.yaml',
-                body: 'This PR adds a Backstage catalog-info.yaml file for import.',
-            }));
-
-            // Submit the PR
-            const result = await this.catalogImportApi.submitPullRequest({
-                repositoryUrl: url,  // 👈 the repo URL the user typed in
-                fileContent: yamlContent,
-                title,
-                body,
-            });
-
-            console.log('Pull request created:', result.link);
-            console.log('Entity will be available at:', result.location);
-            
+    const emptyRequiredYaml: RequiredYamlFields = {
+      apiVersion: 'backstage.io/v1alpha1',
+      kind: '',
+      metadata: {
+        name: '',
+      },
+      spec: {
+        type: '',
+      },
     };
 
-    fetchCatalogInfoStatus = async (url: string) : Promise<Status | undefined> => {
-  
-        try {
-            const analysisResult = await this.catalogImportApi.analyzeUrl(url)
-            if (analysisResult.type == "locations") {
-                return {
-                    message: "Catalog-info.yaml already exists",
-                    severity: "info"
-                }
-            } else if (analysisResult.type == "repository") {
-                return {
-                    message: "Found repository",
-                    severity: "success"
-                }
-            }
-        } catch(error : unknown) {
-            if (error instanceof Error) {
-             return {
-                    message: error.message,
-                    severity: "error"
-                }
-            } else{
-                throw new Error("Unexpected error")
-            }
-        }
-        return undefined
+    const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    const owner = match![1];
+    const repo = match![2];
+
+    const yamlStrings = catalogInfo.map(val =>
+      updateYaml(initialYaml[val.id] ?? emptyRequiredYaml, val),
+    );
+
+    const completeYaml = yamlStrings.join('\n---\n');
+
+    const OctokitPlugin = Octokit.plugin(createPullRequest);
+    const token = await githubAuthApi.getAccessToken();
+    const octokit = new OctokitPlugin({ auth: token });
+    try {
+      await octokit.createPullRequest({
+        owner: owner,
+        repo: repo,
+        title: 'Create/update catalog-info.yaml',
+        body: 'Creates or updates catalog-info.yaml',
+        base: 'main',
+        head: 'Update-or-create-catalog-info',
+        changes: [
+          {
+            files: {
+              [path]: completeYaml,
+            },
+            commit: 'New or updated catalog-info.yaml',
+          },
+        ],
+      });
+      return {
+        message: 'created a pull request',
+        severity: 'success',
+      };
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        error.message =
+          'Could not create a pull request. Make sure the URL is a github repo and that a pull request does not already exist.';
+        throw error;
+      } else {
+        throw new Error('Unkown error when trying to create a PR.');
+      }
     }
+  };
 }

@@ -1,34 +1,30 @@
-import type { CatalogInfoForm, RequiredYamlFields } from '../model/types.ts';
+import type { RequiredYamlFields } from '../model/types.ts';
 import yaml from 'yaml';
+import { FormEntity } from '../schemas/formSchema.ts';
 
-export const updateYaml = (initial: RequiredYamlFields, form: CatalogInfoForm): string => {
+export const updateYaml = (
+  initial: RequiredYamlFields,
+  form: FormEntity,
+): string => {
+  const updated: RequiredYamlFields = {
+    ...initial,
+    kind: form.kind || initial.kind,
+    metadata: {
+      ...initial.metadata,
+      name: form.name || initial.metadata.name,
+    },
+    spec: {
+      ...initial.spec,
+      owner: form.owner || initial.spec.owner || undefined,
+      lifecycle: form.lifecycle || initial.spec.lifecycle || undefined,
+      system: form.system?.length
+        ? form.system
+        : initial.spec.system || undefined,
+      type: form.entityType! || initial.spec.type,
+    },
+  };
 
-    console.log('Initial YAML content:', yaml.stringify(initial));
+  const yamlContent = yaml.stringify(updated);
 
-    const updated: RequiredYamlFields = {
-        ...initial,
-        kind: "Component",
-        metadata: {
-            ...initial.metadata,
-            name: form.name,
-        },
-        spec: {
-            ...initial.spec,
-            owner: form.owner,
-            lifecycle: form.lifecycle || undefined,
-            system: form.system?.length ? form.system : undefined,
-            domain: form.domain?.length ? form.domain : undefined,
-            providesApis: form.providesApis?.length ? form.providesApis : undefined,
-            consumesApis: form.consumesApis?.length ? form.consumesApis : undefined,
-            dependsOn: form.dependsOn?.length ? form.dependsOn : undefined,
-            definition: form.definition?.length ? form.definition : undefined,
-            type: form.type!
-        }
-    };
-
-    console.log('Generated YAML content:', yaml.stringify(updated));
-
-    const yamlContent = yaml.stringify(updated);
-
-    return yamlContent;
+  return yamlContent;
 };

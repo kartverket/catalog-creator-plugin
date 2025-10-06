@@ -1,3 +1,7 @@
+import { Control, FieldErrors } from 'react-hook-form';
+import z from 'zod/v4';
+import { formSchema } from '../schemas/formSchema';
+
 export enum AllowedEntityKinds {
   Component = 'Component',
   API = 'API',
@@ -52,4 +56,10 @@ export type RequiredYamlFields = {
     target?: string;
     [key: string]: any; // Allow additional spec fields
   };
+};
+
+export type FormProps = {
+  index: number;
+  control: Control<z.infer<typeof formSchema>>;
+  errors: FieldErrors<z.infer<typeof formSchema>>;
 };

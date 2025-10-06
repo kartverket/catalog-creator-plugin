@@ -3,10 +3,9 @@ import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { FocusEventHandler, useEffect, useState } from 'react';
 
 import { Entity } from '@backstage/catalog-model';
-import { SearchField, Text } from '@backstage/ui';
+import { SearchField } from '@backstage/ui';
 import { List, ListItemText, Paper } from '@material-ui/core';
 import ListItemButton from '@mui/material/ListItemButton';
-import { S } from 'msw/lib/glossary-2792c6da';
 
 interface CatalogSearchProps {
   value?: string;
@@ -54,6 +53,7 @@ export const CatalogSearch = ({
     if (!selected) {
       setSearchQuery('');
       setShowDropdown(false);
+      onBlur()
     }
   };
 
@@ -64,8 +64,11 @@ export const CatalogSearch = ({
   };
 
   return (
-    <div onBlur={handleOnBlur}>
-      <div style={{position:"relative"}}>
+    <div
+      onBlur={handleOnBlur}
+      style={{ position: 'relative', overflow: 'visible' }}
+    >
+      <div style={{ position: 'relative', overflow: 'visible' }}>
         <SearchField
           placeholder="Search..."
           value={searchQuery}
@@ -86,7 +89,7 @@ export const CatalogSearch = ({
               margin: '2px',
               position: 'absolute',
               zIndex: '1',
-              width: '100%'
+              width: '100%',
             }}
           >
             <List>

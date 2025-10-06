@@ -77,6 +77,8 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   marginRight: '1rem',
                   marginTop: '1rem',
                   padding: '1rem',
+                  position: 'relative',
+                  overflow: 'visible',
                 }}
                 key={entity.key}
               >
@@ -138,21 +140,19 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       </span>
                     )}
                   </div>
-                  <div>
+                  <div style={{ position: 'relative', overflow: 'visible' }}>
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
                       render={({ field: { onChange, onBlur, value } }) => (
-                        <>
-                          <CatalogSearch
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            label="Entity owner"
-                            filter="group"
-                            isRequired
-                          />
-                        </>
+                        <CatalogSearch
+                          value={value}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          label="Entity owner"
+                          filter="group"
+                          isRequired
+                        />
                       )}
                     />
                     {errors.entities?.[index]?.owner && (
@@ -210,21 +210,19 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       )}
                     </div>
                   </Flex>
-                  <div>
+                  <div style={{ position: 'relative', overflow: 'visible' }}>
                     <Controller
                       name={`entities.${index}.system`}
                       control={control}
                       render={({ field: { onChange, onBlur, value } }) => (
-                        <>
-                          <CatalogSearch
-                            value={value}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            label="Entity system"
-                            filter="system"
-                            isRequired={false}
-                          />
-                        </>
+                        <CatalogSearch
+                          value={value}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          label="Entity system"
+                          filter="system"
+                          isRequired={false}
+                        />
                       )}
                     />
                     {errors.entities?.[index]?.system && (

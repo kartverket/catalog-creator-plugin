@@ -106,6 +106,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           />
                         )}
                       />
+
                       {errors.entities?.[index]?.kind && (
                         <span style={{ color: 'red', fontSize: '0.75rem' }}>
                           {errors.entities?.[index]?.kind.message}
@@ -134,11 +135,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.name && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.name.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.name
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.name?.message || '\u00A0'}
+                    </span>
                   </div>
                   <div style={{ position: 'relative', overflow: 'visible' }}>
                     <Controller
@@ -155,11 +163,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.owner && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.owner.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.owner
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.owner?.message || '\u00A0'}
+                    </span>
                   </div>
 
                   <Flex>
@@ -184,14 +199,22 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           />
                         )}
                       />
-                      {errors.entities?.[index]?.lifecycle && (
-                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                          {errors.entities?.[index]?.lifecycle.message}
-                        </span>
-                      )}
+
+                      <span
+                        style={{
+                          color: 'red',
+                          fontSize: '0.75rem',
+                          visibility: errors.entities?.[index]?.lifecycle
+                            ? 'visible'
+                            : 'hidden',
+                        }}
+                      >
+                        {errors.entities?.[index]?.lifecycle?.message ||
+                          '\u00A0'}
+                      </span>
                     </div>
 
-                    <div>
+                    <div style={{ flexGrow: 1 }}>
                       <Controller
                         name={`entities.${index}.entityType`}
                         control={control}
@@ -200,14 +223,23 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                             {...field}
                             name="Entity type"
                             label="Entity type"
+                            isRequired
                           />
                         )}
                       />
-                      {errors.entities?.[index]?.entityType && (
-                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                          {errors.entities?.[index]?.entityType.message}
-                        </span>
-                      )}
+
+                      <span
+                        style={{
+                          color: 'red',
+                          fontSize: '0.75rem',
+                          visibility: errors.entities?.[index]?.entityType
+                            ? 'visible'
+                            : 'hidden',
+                        }}
+                      >
+                        {errors.entities?.[index]?.entityType?.message ||
+                          '\u00A0'}
+                      </span>
                     </div>
                   </Flex>
                   <div style={{ position: 'relative', overflow: 'visible' }}>
@@ -225,11 +257,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.system && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.system.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.system
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.system?.message || '\u00A0'}
+                    </span>
                   </div>
                 </Flex>
               </Card>

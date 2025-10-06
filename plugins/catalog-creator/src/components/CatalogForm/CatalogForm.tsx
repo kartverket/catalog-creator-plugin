@@ -8,7 +8,7 @@ import {
   Card,
 } from '@backstage/ui';
 
-import type { CatalogInfoForm, RequiredYamlFields } from '../../model/types';
+import type { RequiredYamlFields } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -78,8 +78,9 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   marginTop: '1rem',
                   padding: '1rem',
                 }}
+                key={entity.key}
               >
-                <Flex direction="column" justify="start" key={entity.key}>
+                <Flex direction="column" justify="start">
                   <Flex justify="between">
                     <div>
                       <Controller
@@ -122,16 +123,13 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                     <Controller
                       name={`entities.${index}.name`}
                       control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                      <>
-                        <CatalogSearch
-                          value={value}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          label="Owner"
-                          filter="group"
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          name="Name"
+                          label="Entity name"
+                          isRequired
                         />
-                      </>
                       )}
                     />
                     {errors.entities?.[index]?.name && (
@@ -144,13 +142,17 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          name="Owner"
-                          label="Entity owner"
-                          isRequired
-                        />
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <>
+                          <CatalogSearch
+                            value={value}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            label="Entity owner"
+                            filter="group"
+                            isRequired
+                          />
+                        </>
                       )}
                     />
                     {errors.entities?.[index]?.owner && (
@@ -189,11 +191,11 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       )}
                     </div>
 
-                  <div>
-                    <Controller
-                      name={`entities.${index}.entityType`}
-                      control={control}
-                      render={({ field }) => (
+                    <div>
+                      <Controller
+                        name={`entities.${index}.entityType`}
+                        control={control}
+                        render={({ field }) => (
                           <TextField
                             {...field}
                             name="Entity type"
@@ -201,38 +203,41 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           />
                         )}
                       />
-                    {errors.entities?.[index]?.entityType && (
+                      {errors.entities?.[index]?.entityType && (
+                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                          {errors.entities?.[index]?.entityType.message}
+                        </span>
+                      )}
+                    </div>
+                  </Flex>
+                  <div>
+                    <Controller
+                      name={`entities.${index}.system`}
+                      control={control}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <>
+                          <CatalogSearch
+                            value={value}
+                            onChange={onChange}
+                            onBlur={onBlur}
+                            label="Entity system"
+                            filter="system"
+                            isRequired={false}
+                          />
+                        </>
+                      )}
+                    />
+                    {errors.entities?.[index]?.system && (
                       <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.entityType.message}
+                        {errors.entities?.[index]?.system.message}
                       </span>
                     )}
                   </div>
                 </Flex>
-                <div>
-                  <Controller
-                    name={`entities.${index}.system`}
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <>
-                        <CatalogSearch
-                          value={value}
-                          onChange={onChange}
-                          onBlur={onBlur}
-                          label="System"
-                          filter="system"
-                        />
-                      </>
-                    )}
-                  />
-                  {errors.entities?.[index]?.system && (
-                    <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                      {errors.entities?.[index]?.system.message}
-                    </span>
-                  )}
-                </div>
-              </Flex>
+              </Card>
             );
           })}
+
           <Flex direction="row" align="center" style={{ paddingTop: '1rem' }}>
             <Button
               type="button"

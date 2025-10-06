@@ -8,7 +8,7 @@ import { List, ListItemText, Paper } from '@material-ui/core';
 import ListItemButton from '@mui/material/ListItemButton';
 
 interface CatalogSearchProps {
-  value?: string;
+  
   onChange: (owner: string | null) => void;
   onBlur: () => void;
   filter: string;
@@ -17,7 +17,6 @@ interface CatalogSearchProps {
 }
 
 export const CatalogSearch = ({
-  value,
   onChange,
   filter,
   onBlur,
@@ -53,7 +52,7 @@ export const CatalogSearch = ({
     if (!selected) {
       setSearchQuery('');
       setShowDropdown(false);
-      onBlur()
+      onBlur();
     }
   };
 

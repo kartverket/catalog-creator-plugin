@@ -148,13 +148,12 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       {errors.entities?.[index]?.name?.message || '\u00A0'}
                     </span>
                   </div>
-                  <div style={{ position: 'relative', overflow: 'visible' }}>
+                  <div>
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
+                      render={({ field: { onChange, onBlur } }) => (
                         <CatalogSearch
-                          value={value}
                           onChange={onChange}
                           onBlur={onBlur}
                           label="Entity owner"
@@ -242,13 +241,12 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       </span>
                     </div>
                   </Flex>
-                  <div style={{ position: 'relative', overflow: 'visible' }}>
+                  <div>
                     <Controller
                       name={`entities.${index}.system`}
                       control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
+                      render={({ field: { onChange, onBlur } }) => (
                         <CatalogSearch
-                          value={value}
                           onChange={onChange}
                           onBlur={onBlur}
                           label="Entity system"

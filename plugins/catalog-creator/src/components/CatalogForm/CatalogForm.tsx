@@ -1,16 +1,24 @@
-import { Button, Box, Flex, Select, TextField } from '@backstage/ui';
+import {
+  Button,
+  Box,
+  Flex,
+  Select,
+  TextField,
+  Icon,
+  Card,
+} from '@backstage/ui';
 
 import type { CatalogInfoForm, RequiredYamlFields } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
-import { formSchema } from '../../schemas/formSchema';
-import Divider from '@mui/material/Divider';
+import { FormEntity, formSchema } from '../../schemas/formSchema';
+import { useState } from 'react';
 import { CatalogSearch } from '../CatalogSearch';
 
 export type CatalogFormProps = {
-  onSubmit: (data: CatalogInfoForm[]) => void;
+  onSubmit: (data: FormEntity[]) => void;
   currentYaml: RequiredYamlFields[] | null;
 };
 
@@ -22,8 +30,9 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
   } = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       entities: currentYaml
-        ? currentYaml.map((entry: RequiredYamlFields) => {
+        ? currentYaml.map((entry: RequiredYamlFields, index) => {
             return {
+              id: index,
               kind: entry.kind as AllowedEntityKinds,
               name: entry.metadata.name,
               owner: entry.spec.owner,
@@ -34,6 +43,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           })
         : [
             {
+              id: 0,
               kind: AllowedEntityKinds.Component,
               name: '',
               owner: '',
@@ -44,76 +54,75 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     mode: 'onBlur',
   });
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: 'entities',
+    keyName: 'key',
     control,
   });
+  const [indexCount, setIndexCount] = useState(fields.length);
 
   return (
     <>
       <form
         onSubmit={handleSubmit(data => {
-          onSubmit(data.entities as CatalogInfoForm[]);
+          onSubmit(data.entities as FormEntity[]);
         })}
       >
         <Box px="2rem">
           <h2>Catalog-info.yaml Form</h2>
           {fields.map((entity, index) => {
             return (
-              <Flex direction="column" justify="start" key={entity.id}>
-                {index !== 0 && <Divider variant="middle" sx={{ mt: 3 }} />}
-                <div>
-                  <Controller
-                    name={`entities.${index}.kind`}
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                      <Select
-                        name="kind"
-                        label="Entity kind"
-                        onBlur={onBlur}
-                        onSelectionChange={onChange}
-                        selectedKey={value}
-                        options={Object.values(AllowedEntityKinds).map(
-                          entityKind => ({
-                            value: entityKind as string,
-                            label: entityKind,
-                          }),
+              <Card
+                style={{
+                  marginRight: '1rem',
+                  marginTop: '1rem',
+                  padding: '1rem',
+                }}
+              >
+                <Flex direction="column" justify="start" key={entity.key}>
+                  <Flex justify="between">
+                    <div>
+                      <Controller
+                        name={`entities.${index}.kind`}
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Select
+                            name="kind"
+                            label="Entity kind"
+                            onBlur={onBlur}
+                            onSelectionChange={onChange}
+                            selectedKey={value}
+                            options={Object.values(AllowedEntityKinds).map(
+                              entityKind => ({
+                                value: entityKind as string,
+                                label: entityKind,
+                              }),
+                            )}
+                            isRequired
+                            isDisabled={index === 0}
+                          />
                         )}
-                        isRequired
-                        isDisabled={index === 0}
                       />
+                      {errors.entities?.[index]?.kind && (
+                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                          {errors.entities?.[index]?.kind.message}
+                        </span>
+                      )}
+                    </div>
+                    {index !== 0 && (
+                      <Button
+                        style={{ width: '40px', alignSelf: 'flex-end' }}
+                        onClick={() => remove(index)}
+                      >
+                        <Icon name="trash" />
+                      </Button>
                     )}
-                  />
-                  {errors.entities?.[index]?.kind && (
-                    <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                      {errors.entities?.[index]?.kind.message}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <Controller
-                    name={`entities.${index}.name`}
-                    control={control}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        name="Name"
-                        label="Entity name"
-                        isRequired
-                      />
-                    )}
-                  />
-                  {errors.entities?.[index]?.name && (
-                    <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                      {errors.entities?.[index]?.name.message}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <Controller
-                    name={`entities.${index}.owner`}
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
+                  </Flex>
+                  <div>
+                    <Controller
+                      name={`entities.${index}.name`}
+                      control={control}
+                      render={({ field: { onChange, onBlur, value } }) => (
                       <>
                         <CatalogSearch
                           value={value}
@@ -123,65 +132,75 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           filter="group"
                         />
                       </>
+                      )}
+                    />
+                    {errors.entities?.[index]?.name && (
+                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                        {errors.entities?.[index]?.name.message}
+                      </span>
                     )}
-                  />
-                  {errors.entities?.[index]?.owner && (
-                    <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                      {errors.entities?.[index]?.owner.message}
-                    </span>
-                  )}
-                </div>
-
-                <Flex>
+                  </div>
                   <div>
                     <Controller
-                      name={`entities.${index}.lifecycle`}
+                      name={`entities.${index}.owner`}
                       control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Select
-                          name="lifecycle"
-                          label="Entity lifecycle"
-                          onBlur={onBlur}
-                          onSelectionChange={onChange}
-                          selectedKey={value}
-                          options={Object.values(AllowedLifecycleStages).map(
-                            lifecycleStage => ({
-                              value: lifecycleStage as string,
-                              label: lifecycleStage,
-                            }),
-                          )}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          name="Owner"
+                          label="Entity owner"
                           isRequired
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.lifecycle && (
+                    {errors.entities?.[index]?.owner && (
                       <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.lifecycle.message}
+                        {errors.entities?.[index]?.owner.message}
                       </span>
                     )}
                   </div>
+
+                  <Flex>
+                    <div>
+                      <Controller
+                        name={`entities.${index}.lifecycle`}
+                        control={control}
+                        render={({ field: { onChange, onBlur, value } }) => (
+                          <Select
+                            name="lifecycle"
+                            label="Entity lifecycle"
+                            onBlur={onBlur}
+                            onSelectionChange={onChange}
+                            selectedKey={value}
+                            options={Object.values(AllowedLifecycleStages).map(
+                              lifecycleStage => ({
+                                value: lifecycleStage as string,
+                                label: lifecycleStage,
+                              }),
+                            )}
+                            isRequired
+                          />
+                        )}
+                      />
+                      {errors.entities?.[index]?.lifecycle && (
+                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
+                          {errors.entities?.[index]?.lifecycle.message}
+                        </span>
+                      )}
+                    </div>
 
                   <div>
                     <Controller
                       name={`entities.${index}.entityType`}
                       control={control}
-                      render={({ field: { onChange, onBlur, value } }) => (
-                        <Select
-                          name="type"
-                          label="Entity type"
-                          onBlur={onBlur}
-                          onSelectionChange={onChange}
-                          defaultSelectedKey={value}
-                          options={Object.values(AllowedEntityKinds).map(
-                            entityKind => ({
-                              value: entityKind as string,
-                              label: entityKind,
-                            }),
-                          )}
-                          isRequired
-                        />
-                      )}
-                    />
+                      render={({ field }) => (
+                          <TextField
+                            {...field}
+                            name="Entity type"
+                            label="Entity type"
+                          />
+                        )}
+                      />
                     {errors.entities?.[index]?.entityType && (
                       <span style={{ color: 'red', fontSize: '0.75rem' }}>
                         {errors.entities?.[index]?.entityType.message}
@@ -217,16 +236,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           <Flex direction="row" align="center" style={{ paddingTop: '1rem' }}>
             <Button
               type="button"
-              onClick={() =>
+              onClick={() => {
                 append({
+                  id: indexCount,
                   kind: AllowedEntityKinds.Component,
                   name: '',
                   owner: '',
                   lifecycle: AllowedLifecycleStages.production,
                   entityType: 'library',
                   system: '',
-                })
-              }
+                });
+                setIndexCount(prev => prev + 1);
+              }}
             >
               Add Entity
             </Button>

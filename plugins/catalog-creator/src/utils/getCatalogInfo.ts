@@ -43,9 +43,11 @@ export async function getCatalogInfo(
     return documentList;
   } catch (error: unknown) {
     if (error instanceof Error) {
+      if (error.message.toLowerCase().includes('credentials')) {
+        throw error;
+      }
       return null;
-    } 
-      throw error;
-    
+    }
+    throw error;
   }
 }

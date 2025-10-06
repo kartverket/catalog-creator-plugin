@@ -9,15 +9,11 @@ import {
 
 import { githubAuthApiRef, OAuthApi, useApi } from '@backstage/core-plugin-api';
 
-import { catalogImportApiRef } from '@backstage/plugin-catalog-import';
+import {
+  AnalyzeResult,
+  catalogImportApiRef,
+} from '@backstage/plugin-catalog-import';
 
-import { useState } from 'react';
-
-import type {
-  CatalogInfoForm,
-  RequiredYamlFields,
-  Status,
-} from '../../model/types';
 import { CatalogForm } from '../CatalogForm';
 
 import { GithubController } from '../../controllers/githubController';
@@ -26,53 +22,54 @@ import { getCatalogInfo } from '../../utils/getCatalogInfo';
 import { useAsyncFn } from 'react-use';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { useState } from 'react';
+import { FormEntity } from '../../schemas/formSchema';
 
 export const CatalogCreatorPage = () => {
-  const [prError, setprError] = useState(false)
-  const [url, setUrl] = useState('');
-  const [submittedPR, setSubmittedPR] = useState<boolean>(false);
-
   const catalogImportApi = useApi(catalogImportApiRef);
   const githubAuthApi: OAuthApi = useApi(githubAuthApiRef);
   const githubController = new GithubController();
+
+  const [url, setUrl] = useState('');
+
   const [catalogInfoState, doFetchCatalogInfo] = useAsyncFn(
-    async catalogUrl => {
-
-       const analysisResult = await catalogImportApi.analyzeUrl(catalogUrl);
-      let response: RequiredYamlFields[] | null = null;
-      if (analysisResult.type === 'locations') {
-        response = await getCatalogInfo(analysisResult.locations[0].target, githubAuthApi);
+    async (catInfoUrl: string | null) => {
+      if (catInfoUrl === null) {
+        return null;
       }
-
-      return { analysisResult, response };
+      return await getCatalogInfo(catInfoUrl, githubAuthApi);
     },
-    [url],
+    [url, githubAuthApi],
   );
 
+  const [analysisResult, doAnalyzeUrl] = useAsyncFn(async () => {
+    const result = await catalogImportApi.analyzeUrl(url);
+    if (result.type === 'locations') {
+      doFetchCatalogInfo(result.locations[0].target);
+    } else {
+      doFetchCatalogInfo(null);
+    }
+    return result;
+  }, [url, githubAuthApi, catalogImportApi.analyzeUrl, doFetchCatalogInfo]);
 
   const [repoState, doSubmitToGithub] = useAsyncFn(
-    async (catalogInfoFormList: CatalogInfoForm[]) => {
-      setprError(true)
-      const repoStatus: Status | undefined =
-        await githubController.submitCatalogInfoToGithub(
-          url,
-          catalogInfoState.value?.response || [],
+    async (submitUrl: string, catalogInfoFormList?: FormEntity[]) => {
+      if (catalogInfoFormList !== undefined) {
+        return await githubController.submitCatalogInfoToGithub(
+          submitUrl,
+          catalogInfoState.value || [],
           catalogInfoFormList,
           githubAuthApi,
         );
-      if (repoStatus?.severity === 'success') {
-        setSubmittedPR(true);
       }
-      
-      return { repoStatus };
+      return undefined;
     },
-    [catalogInfoState.value?.response],
+    [
+      githubController.submitCatalogInfoToGithub,
+      githubAuthApi,
+      catalogInfoState.value,
+    ],
   );
-
-  const resetForm = () => {
-    setUrl('');
-    setSubmittedPR(false);
-  };
 
   return (
     <Page themeId="tool">
@@ -82,7 +79,7 @@ export const CatalogCreatorPage = () => {
         </ContentHeader>
 
         <Box maxWidth="500px">
-          {submittedPR ? (
+          {repoState.value?.severity === 'success' ? (
             <Card>
               <Box px="2rem">
                 <Flex
@@ -95,7 +92,8 @@ export const CatalogCreatorPage = () => {
                   </Alert>
                   <Link
                     onClick={() => {
-                      resetForm();
+                      setUrl('');
+                      doSubmitToGithub('', undefined);
                     }}
                   >
                     Register a new component?
@@ -108,8 +106,8 @@ export const CatalogCreatorPage = () => {
               <form
                 onSubmit={e => {
                   e.preventDefault();
-                  doFetchCatalogInfo(url);
-                  setprError(false)
+                  doAnalyzeUrl();
+                  doSubmitToGithub('', undefined);
                 }}
               >
                 <Box px="2rem">
@@ -132,28 +130,28 @@ export const CatalogCreatorPage = () => {
                 </Box>
               </form>
 
-              {
-                (catalogInfoState.value?.analysisResult.type === "locations") && !(catalogInfoState.error || prError)
-                &&
-                 <Alert sx={{ mx: 2 }} severity="info">
-                  Catalog-info.yaml already exists. Editing existing file.
-                </Alert>
-              }
+              {analysisResult.value?.type === 'locations' &&
+                !(catalogInfoState.error || repoState.error) && (
+                  <Alert sx={{ mx: 2 }} severity="info">
+                    Catalog-info.yaml already exists. Editing existing file.
+                  </Alert>
+                )}
 
-              {(catalogInfoState.error) && (
-                <Alert sx={{ mx: 2 }} severity="error">
-                  {catalogInfoState.error?.message||repoState.error?.message}
-                </Alert>)
-              }
-
-              {(repoState.error && prError) && (
+              {repoState.error && (
                 <Alert sx={{ mx: 2 }} severity="error">
                   {repoState.error?.message}
-                </Alert>)
-              }
-             
+                </Alert>
+              )}
 
-              {repoState.loading || catalogInfoState.loading ? (
+              {catalogInfoState.error && (
+                <Alert sx={{ mx: 2 }} severity="error">
+                  {catalogInfoState.error?.message || repoState.error?.message}
+                </Alert>
+              )}
+
+              {repoState.loading ||
+              analysisResult.loading ||
+              catalogInfoState.loading ? (
                 <div
                   style={{
                     display: 'flex',
@@ -167,10 +165,16 @@ export const CatalogCreatorPage = () => {
                 </div>
               ) : (
                 <div>
-                  {(catalogInfoState.value?.analysisResult.type) && (
+                  {catalogInfoState.value !== undefined &&
+                    analysisResult.value !== undefined && (
                       <CatalogForm
-                        onSubmit={doSubmitToGithub}
-                        currentYaml={catalogInfoState.value?.response}
+                        onSubmit={data =>
+                          doSubmitToGithub(
+                            getSubmitUrl(analysisResult.value),
+                            data,
+                          )
+                        }
+                        currentYaml={catalogInfoState.value}
                       />
                     )}
                 </div>
@@ -182,3 +186,10 @@ export const CatalogCreatorPage = () => {
     </Page>
   );
 };
+
+function getSubmitUrl(analysisResult: AnalyzeResult) {
+  if (analysisResult.type === 'locations') {
+    return analysisResult.locations[0].target;
+  }
+  return analysisResult.url;
+}

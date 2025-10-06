@@ -1,20 +1,16 @@
-import type {
-  CatalogInfoForm,
-  RequiredYamlFields,
-  Status,
-} from '../model/types.ts';
+import type { RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
 import { Octokit } from '@octokit/core';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import { OAuthApi } from '@backstage/core-plugin-api';
+import { FormEntity } from '../schemas/formSchema.ts';
 
 export class GithubController {
-
   submitCatalogInfoToGithub = async (
     url: string,
     initialYaml: RequiredYamlFields[],
-    catalogInfo: CatalogInfoForm[],
+    catalogInfo: FormEntity[],
     githubAuthApi: OAuthApi,
   ): Promise<Status | undefined> => {
     const path = new URL(url).pathname.slice(1);
@@ -34,8 +30,8 @@ export class GithubController {
     const owner = match![1];
     const repo = match![2];
 
-    const yamlStrings = catalogInfo.map((val, index) =>
-      updateYaml(initialYaml[index] ?? emptyRequiredYaml, val),
+    const yamlStrings = catalogInfo.map(val =>
+      updateYaml(initialYaml[val.id] ?? emptyRequiredYaml, val),
     );
 
     const completeYaml = yamlStrings.join('\n---\n');
@@ -64,12 +60,13 @@ export class GithubController {
         message: 'created a pull request',
         severity: 'success',
       };
-    } catch (error : unknown) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
-        error.message = "Could not create a pull request. Make sure the URL is a github repo and that a pull request does not already exist."
-        throw error
+        error.message =
+          'Could not create a pull request. Make sure the URL is a github repo and that a pull request does not already exist.';
+        throw error;
       } else {
-        throw new Error("Unkown error when trying to create a PR.")
+        throw new Error('Unkown error when trying to create a PR.');
       }
     }
   };

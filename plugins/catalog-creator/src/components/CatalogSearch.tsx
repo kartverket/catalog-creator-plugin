@@ -73,7 +73,7 @@ export const CatalogSearch = ({
               overflowY: 'auto',
               margin: '2px',
               position: 'absolute',
-              zIndex: '1',
+              zIndex: 1,
               width: '100%',
             }}
           >

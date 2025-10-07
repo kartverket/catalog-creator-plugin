@@ -8,7 +8,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 interface CatalogSearchProps {
   value: string | undefined;
   entityList: Entity[];
-  onChange: (owner: string | null) => void;
+  onChange: (entity: string | null) => void;
   onBlur: () => void;
 
   label: string;
@@ -78,18 +78,18 @@ export const CatalogSearch = ({
             }}
           >
             <List>
-              {filteredEntities.map((owner, idx) => (
+              {filteredEntities.map(entity => (
                 <ListItemButton
-                  key={idx}
+                  key={entity.metadata.name}
                   onMouseDown={e => e.preventDefault()}
                   onClick={e => {
                     e.stopPropagation();
-                    onChange(owner.metadata.name);
+                    onChange(entity.metadata.name);
                     setShowDropdown(false);
                     onBlur();
                   }}
                 >
-                  <ListItemText primary={owner.metadata.name} />
+                  <ListItemText primary={entity.metadata.name} />
                 </ListItemButton>
               ))}
             </List>

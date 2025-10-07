@@ -16,6 +16,11 @@ import { z } from 'zod/v4';
 import { FormEntity, formSchema } from '../../schemas/formSchema';
 import { useState } from 'react';
 import { CatalogSearch } from '../CatalogSearch';
+import useAsync from 'react-use/esm/useAsync';
+
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import { useApi } from '@backstage/core-plugin-api';
+import { Entity } from '@backstage/catalog-model';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -23,6 +28,27 @@ export type CatalogFormProps = {
 };
 
 export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
+  const catalogApi = useApi(catalogApiRef);
+
+  const fetchOwners = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'group',
+      },
+    });
+
+    return results.items as Entity[];
+  }, [catalogApi]);
+
+  const fetchSystems = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'system',
+      },
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
   const {
     handleSubmit,
     formState: { errors },
@@ -152,12 +178,13 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
-                      render={({ field: { onChange, onBlur } }) => (
+                      render={({ field: { onChange, onBlur, value } }) => (
                         <CatalogSearch
+                          value={value}
+                          entityList={fetchOwners.value || []}
                           onChange={onChange}
                           onBlur={onBlur}
                           label="Entity owner"
-                          filter="group"
                           isRequired
                         />
                       )}
@@ -245,12 +272,13 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                     <Controller
                       name={`entities.${index}.system`}
                       control={control}
-                      render={({ field: { onChange, onBlur } }) => (
+                      render={({ field: { onChange, onBlur, value } }) => (
                         <CatalogSearch
+                          value={value}
+                          entityList={fetchSystems.value || []}
                           onChange={onChange}
                           onBlur={onBlur}
                           label="Entity system"
-                          filter="system"
                           isRequired={false}
                         />
                       )}

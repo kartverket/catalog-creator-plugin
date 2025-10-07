@@ -1,6 +1,6 @@
 import { Control, FieldErrors } from 'react-hook-form';
 import z from 'zod/v4';
-import { formSchema } from '../schemas/formSchema';
+import { entitySchema, formSchema } from '../schemas/formSchema';
 
 export enum AllowedEntityKinds {
   Component = 'Component',
@@ -10,6 +10,8 @@ export enum AllowedEntityKinds {
   Domain = 'Domain',
   Resource = 'Resource',
 }
+
+export type kind = 'Component' | 'API';
 
 export enum AllowedLifecycleStages {
   development = 'development',
@@ -22,6 +24,8 @@ export type Status = {
   severity: 'error' | 'success' | 'warning' | 'info';
   url?: string;
 };
+
+export type FormEntity = z.infer<typeof entitySchema>;
 
 export type RequiredYamlFields = {
   apiVersion: 'backstage.io/v1alpha1';

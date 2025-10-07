@@ -1,10 +1,11 @@
-import type { RequiredYamlFields } from '../model/types.ts';
+import z from 'zod/v4';
+import { RequiredYamlFields } from '../model/types.ts';
 import yaml from 'yaml';
-import { FormEntity } from '../schemas/formSchema.ts';
+import { entitySchema } from '../schemas/formSchema.ts';
 
 export const updateYaml = (
   initial: RequiredYamlFields,
-  form: FormEntity,
+  form: z.infer<typeof entitySchema>,
 ): string => {
   const updated: RequiredYamlFields = {
     ...initial,

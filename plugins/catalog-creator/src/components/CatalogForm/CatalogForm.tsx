@@ -1,11 +1,11 @@
 import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
 
-import type { RequiredYamlFields } from '../../model/types';
+import type { FormEntity, kind, RequiredYamlFields } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
-import { FormEntity, formSchema } from '../../schemas/formSchema';
+import { entitySchema, formSchema } from '../../schemas/formSchema';
 import { useState } from 'react';
 import { ComponentForm } from './Forms/ComponentForm';
 import { ApiForm } from './Forms/ApiForm';
@@ -26,7 +26,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         ? currentYaml.map((entry: RequiredYamlFields, index) => {
             return {
               id: index,
-              kind: entry.kind as AllowedEntityKinds,
+              kind: entry.kind as kind,
               name: entry.metadata.name,
               owner: entry.spec.owner,
               lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
@@ -37,7 +37,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         : [
             {
               id: 0,
-              kind: AllowedEntityKinds.Component,
+              kind: 'Component',
               name: '',
               owner: '',
             },
@@ -53,9 +53,36 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     control,
   });
   const [indexCount, setIndexCount] = useState(fields.length);
-  const [addEntityKind, setAddEntityKind] = useState<AllowedEntityKinds>(
-    'Component' as AllowedEntityKinds,
-  );
+  const [addEntityKind, setAddEntityKind] = useState<kind>('Component');
+
+  const appendHandler = () => {
+    let entity: z.infer<typeof entitySchema>;
+    switch (addEntityKind) {
+      case 'Component' as kind:
+        entity = {
+          id: indexCount,
+          kind: addEntityKind,
+          name: '',
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: 'library',
+          system: '',
+        };
+        break;
+      default:
+        entity = {
+          id: indexCount,
+          kind: addEntityKind,
+          name: '',
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: 'library',
+          system: '',
+        };
+    }
+    setIndexCount(prev => prev + 1);
+    append(entity);
+  };
 
   return (
     <>
@@ -120,9 +147,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             <Select
               label="Entity kind"
               selectedKey={addEntityKind}
-              onSelectionChange={value =>
-                setAddEntityKind(value as AllowedEntityKinds)
-              }
+              onSelectionChange={value => setAddEntityKind(value as kind)}
               options={Object.values(AllowedEntityKinds).map(
                 lifecycleStage => ({
                   value: lifecycleStage as string,
@@ -130,21 +155,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                 }),
               )}
             />
-            <Button
-              type="button"
-              onClick={() => {
-                append({
-                  id: indexCount,
-                  kind: addEntityKind,
-                  name: '',
-                  owner: '',
-                  lifecycle: AllowedLifecycleStages.production,
-                  entityType: 'library',
-                  system: '',
-                });
-                setIndexCount(prev => prev + 1);
-              }}
-            >
+            <Button type="button" onClick={() => appendHandler()}>
               Add Entity
             </Button>
             <Button variant="primary" type="submit">

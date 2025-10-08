@@ -111,7 +111,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           />
         );
       default:
-        return <p>No valid form kind was provided</p>;
+        return <p>A form for this kind does not exist</p>;
     }
   };
 
@@ -165,21 +165,28 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             );
           })}
 
-          <Flex direction="row" align="center" style={{ paddingTop: '1rem' }}>
-            <Select
-              label="Entity kind"
-              selectedKey={addEntityKind}
-              onSelectionChange={value => setAddEntityKind(value as kind)}
-              options={Object.values(AllowedEntityKinds).map(
-                lifecycleStage => ({
-                  value: lifecycleStage as string,
-                  label: lifecycleStage,
-                }),
-              )}
-            />
-            <Button type="button" onClick={() => appendHandler()}>
-              Add Entity
-            </Button>
+          <Flex
+            direction="row"
+            align="end"
+            justify="between"
+            style={{ paddingTop: '1rem' }}
+          >
+            <Flex align="end">
+              <Select
+                label="Select entity kind"
+                selectedKey={addEntityKind}
+                onSelectionChange={value => setAddEntityKind(value as kind)}
+                options={Object.values(AllowedEntityKinds).map(
+                  lifecycleStage => ({
+                    value: lifecycleStage as string,
+                    label: lifecycleStage,
+                  }),
+                )}
+              />
+              <Button type="button" onClick={() => appendHandler()}>
+                Add Entity
+              </Button>
+            </Flex>
             <Button variant="primary" type="submit">
               Create pull request
             </Button>

@@ -152,7 +152,7 @@ export const ComponentForm = ({
           name={`entities.${index}.providesApis`}
           control={control}
           render={({ field }) => (
-            <TextField {...field} name="Name" label="Provides APIs" />
+            <TextField {...field} name="ProvidesApis" label="Provides APIs" />
           )}
         />
 
@@ -160,10 +160,48 @@ export const ComponentForm = ({
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors?.name ? 'visible' : 'hidden',
+            visibility: errors?.providesApis ? 'visible' : 'hidden',
           }}
         >
-          {errors?.name?.message || '\u00A0'}
+          {errors?.providesApis?.message || '\u00A0'}
+        </span>
+      </div>
+      <div>
+        <Controller
+          name={`entities.${index}.consumesApis`}
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} name="ConsumesApis" label="Consumes APIs" />
+          )}
+        />
+
+        <span
+          style={{
+            color: 'red',
+            fontSize: '0.75rem',
+            visibility: errors?.consumesApis ? 'visible' : 'hidden',
+          }}
+        >
+          {errors?.consumesApis?.message || '\u00A0'}
+        </span>
+      </div>
+      <div>
+        <Controller
+          name={`entities.${index}.dependsOn`}
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} name="DependsOn" label="Depends on" />
+          )}
+        />
+
+        <span
+          style={{
+            color: 'red',
+            fontSize: '0.75rem',
+            visibility: errors?.dependsOn ? 'visible' : 'hidden',
+          }}
+        >
+          {errors?.dependsOn?.message || '\u00A0'}
         </span>
       </div>
     </Flex>

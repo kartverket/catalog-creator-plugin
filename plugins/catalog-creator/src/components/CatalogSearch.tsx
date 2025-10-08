@@ -29,20 +29,16 @@ export const CatalogSearch = ({
     const displayName = entity.metadata.name || '';
     if (value) {
       return displayName.includes(value.toLowerCase());
-    }
-    return displayName;
-  });
-
   const handleOnBlur: FocusEventHandler<HTMLDivElement> = () => {
-    const entityNames = entityList.map(entity => entity.metadata.name);
     setShowDropdown(false);
-    if (value && entityNames.includes(value)) {
-      onChange(value || '');
+    if (value && entityList.some(({ metadata: { name } }) => name === value)) {
+      onChange(value);
     } else {
       onChange('');
     }
     onBlur();
   };
+
 
   const handleFocus = () => {
     setShowDropdown(true);

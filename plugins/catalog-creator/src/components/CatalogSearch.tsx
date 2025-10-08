@@ -25,10 +25,13 @@ export const CatalogSearch = ({
 }: CatalogSearchProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const filteredEntities = entityList.filter(entity => {
-    const displayName = entity.metadata.name || '';
-    if (value) {
-      return displayName.includes(value.toLowerCase());
+  const filteredEntities =
+    value !== undefined
+      ? entityList.filter(({ metadata: { name } }) => {
+          return name.includes(value.toLowerCase());
+        })
+      : entityList;
+
   const handleOnBlur: FocusEventHandler<HTMLDivElement> = () => {
     setShowDropdown(false);
     if (value && entityList.some(({ metadata: { name } }) => name === value)) {
@@ -38,7 +41,6 @@ export const CatalogSearch = ({
     }
     onBlur();
   };
-
 
   const handleFocus = () => {
     setShowDropdown(true);

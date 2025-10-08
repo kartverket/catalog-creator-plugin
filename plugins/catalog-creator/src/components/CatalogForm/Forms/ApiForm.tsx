@@ -4,14 +4,23 @@ import CatalogSearch from '../../CatalogSearch';
 import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
+import { Entity } from '@backstage/catalog-model';
 
 export type ApiFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'API'>;
+  owners: Entity[];
+  systems: Entity[];
 };
 
-export const ApiForm = ({ index, control, errors }: ApiFormProps) => {
+export const ApiForm = ({
+  index,
+  control,
+  errors,
+  owners,
+  systems,
+}: ApiFormProps) => {
   return (
     <Flex direction="column" justify="start">
       <div>
@@ -37,12 +46,13 @@ export const ApiForm = ({ index, control, errors }: ApiFormProps) => {
         <Controller
           name={`entities.${index}.owner`}
           control={control}
-          render={({ field: { onChange, onBlur } }) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
               label="Entity owner"
-              filter="group"
+              value={value}
+              entityList={owners}
               isRequired
             />
           )}
@@ -122,13 +132,14 @@ export const ApiForm = ({ index, control, errors }: ApiFormProps) => {
         <Controller
           name={`entities.${index}.system`}
           control={control}
-          render={({ field: { onChange, onBlur } }) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
               label="Entity system"
-              filter="system"
+              entityList={systems}
               isRequired={false}
+              value={value}
             />
           )}
         />

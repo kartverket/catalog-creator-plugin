@@ -4,17 +4,22 @@ import CatalogSearch from '../../CatalogSearch';
 import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
+import { Entity } from '@backstage/catalog-model';
 
 export type ComponentFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'Component'>;
+  owners: Entity[];
+  systems: Entity[];
 };
 
 export const ComponentForm = ({
   index,
   control,
   errors,
+  owners,
+  systems,
 }: ComponentFormProps) => {
   return (
     <Flex direction="column" justify="start">
@@ -41,13 +46,14 @@ export const ComponentForm = ({
         <Controller
           name={`entities.${index}.owner`}
           control={control}
-          render={({ field: { onChange, onBlur } }) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
               label="Entity owner"
-              filter="group"
+              value={value}
               isRequired
+              entityList={owners}
             />
           )}
         />
@@ -126,13 +132,14 @@ export const ComponentForm = ({
         <Controller
           name={`entities.${index}.system`}
           control={control}
-          render={({ field: { onChange, onBlur } }) => (
+          render={({ field: { onChange, onBlur, value } }) => (
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
               label="Entity system"
-              filter="system"
+              value={value}
               isRequired={false}
+              entityList={systems}
             />
           )}
         />

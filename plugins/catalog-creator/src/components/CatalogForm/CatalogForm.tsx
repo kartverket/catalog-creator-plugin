@@ -14,6 +14,11 @@ import { entitySchema, formSchema } from '../../schemas/formSchema';
 import { useState } from 'react';
 import { ComponentForm } from './Forms/ComponentForm';
 import { ApiForm } from './Forms/ApiForm';
+import useAsync from 'react-use/esm/useAsync';
+
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import { useApi } from '@backstage/core-plugin-api';
+import { Entity } from '@backstage/catalog-model';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -21,6 +26,27 @@ export type CatalogFormProps = {
 };
 
 export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
+  const catalogApi = useApi(catalogApiRef);
+
+  const fetchOwners = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'group',
+      },
+    });
+
+    return results.items as Entity[];
+  }, [catalogApi]);
+
+  const fetchSystems = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'system',
+      },
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
   const {
     handleSubmit,
     formState: { errors },
@@ -100,6 +126,8 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'Component'>}
+            owners={fetchOwners.value || []}
+            systems={fetchSystems.value || []}
           />
         );
       case 'API':
@@ -108,6 +136,8 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'API'>}
+            owners={fetchOwners.value || []}
+            systems={fetchSystems.value || []}
           />
         );
       default:

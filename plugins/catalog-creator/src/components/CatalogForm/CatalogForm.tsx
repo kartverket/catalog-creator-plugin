@@ -8,16 +8,19 @@ import {
   Card,
 } from '@backstage/ui';
 
-import {
-  AllowedEntityKinds,
-  AllowedLifecycleStages,
-  type RequiredYamlFields,
-} from '../../model/types';
+import type { RequiredYamlFields } from '../../model/types';
+import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 import { FormEntity, formSchema } from '../../schemas/formSchema';
 import { useState } from 'react';
+import { CatalogSearch } from '../CatalogSearch';
+import useAsync from 'react-use/esm/useAsync';
+
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import { useApi } from '@backstage/core-plugin-api';
+import { Entity } from '@backstage/catalog-model';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -25,6 +28,27 @@ export type CatalogFormProps = {
 };
 
 export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
+  const catalogApi = useApi(catalogApiRef);
+
+  const fetchOwners = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'group',
+      },
+    });
+
+    return results.items as Entity[];
+  }, [catalogApi]);
+
+  const fetchSystems = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'system',
+      },
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
   const {
     handleSubmit,
     formState: { errors },
@@ -79,9 +103,12 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   marginRight: '1rem',
                   marginTop: '1rem',
                   padding: '1rem',
+                  position: 'relative',
+                  overflow: 'visible',
                 }}
+                key={entity.key}
               >
-                <Flex direction="column" justify="start" key={entity.key}>
+                <Flex direction="column" justify="start">
                   <Flex justify="between">
                     <div>
                       <Controller
@@ -105,6 +132,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           />
                         )}
                       />
+
                       {errors.entities?.[index]?.kind && (
                         <span style={{ color: 'red', fontSize: '0.75rem' }}>
                           {errors.entities?.[index]?.kind.message}
@@ -133,30 +161,46 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.name && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.name.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.name
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.name?.message || '\u00A0'}
+                    </span>
                   </div>
                   <div>
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          name="Owner"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <CatalogSearch
+                          value={value}
+                          entityList={fetchOwners.value || []}
+                          onChange={onChange}
+                          onBlur={onBlur}
                           label="Entity owner"
                           isRequired
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.owner && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.owner.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.owner
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.owner?.message || '\u00A0'}
+                    </span>
                   </div>
 
                   <Flex>
@@ -181,14 +225,22 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                           />
                         )}
                       />
-                      {errors.entities?.[index]?.lifecycle && (
-                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                          {errors.entities?.[index]?.lifecycle.message}
-                        </span>
-                      )}
+
+                      <span
+                        style={{
+                          color: 'red',
+                          fontSize: '0.75rem',
+                          visibility: errors.entities?.[index]?.lifecycle
+                            ? 'visible'
+                            : 'hidden',
+                        }}
+                      >
+                        {errors.entities?.[index]?.lifecycle?.message ||
+                          '\u00A0'}
+                      </span>
                     </div>
 
-                    <div>
+                    <div style={{ flexGrow: 1 }}>
                       <Controller
                         name={`entities.${index}.entityType`}
                         control={control}
@@ -197,38 +249,58 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                             {...field}
                             name="Entity type"
                             label="Entity type"
+                            isRequired
                           />
                         )}
                       />
-                      {errors.entities?.[index]?.entityType && (
-                        <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                          {errors.entities?.[index]?.entityType.message}
-                        </span>
-                      )}
+
+                      <span
+                        style={{
+                          color: 'red',
+                          fontSize: '0.75rem',
+                          visibility: errors.entities?.[index]?.entityType
+                            ? 'visible'
+                            : 'hidden',
+                        }}
+                      >
+                        {errors.entities?.[index]?.entityType?.message ||
+                          '\u00A0'}
+                      </span>
                     </div>
                   </Flex>
                   <div>
                     <Controller
                       name={`entities.${index}.system`}
                       control={control}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          name="System"
-                          label="Entity System"
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <CatalogSearch
+                          value={value}
+                          entityList={fetchSystems.value || []}
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          label="Entity system"
+                          isRequired={false}
                         />
                       )}
                     />
-                    {errors.entities?.[index]?.system && (
-                      <span style={{ color: 'red', fontSize: '0.75rem' }}>
-                        {errors.entities?.[index]?.system.message}
-                      </span>
-                    )}
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.system
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.system?.message || '\u00A0'}
+                    </span>
                   </div>
                 </Flex>
               </Card>
             );
           })}
+
           <Flex direction="row" align="center" style={{ paddingTop: '1rem' }}>
             <Button
               type="button"
@@ -239,7 +311,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   name: '',
                   owner: '',
                   lifecycle: AllowedLifecycleStages.production,
-                  entityType: '',
+                  entityType: 'library',
                   system: '',
                 });
                 setIndexCount(prev => prev + 1);

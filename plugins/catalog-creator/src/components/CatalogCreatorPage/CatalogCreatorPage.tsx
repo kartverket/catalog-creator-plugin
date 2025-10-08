@@ -78,7 +78,10 @@ export const CatalogCreatorPage = () => {
           <SupportButton />
         </ContentHeader>
 
-        <Box maxWidth="500px">
+        <Box
+          maxWidth="500px"
+          
+        >
           {repoState.value?.severity === 'success' ? (
             <Card>
               <Box px="2rem">
@@ -102,7 +105,7 @@ export const CatalogCreatorPage = () => {
               </Box>
             </Card>
           ) : (
-            <Card>
+            <Card style={{ position: 'relative', overflow: 'visible' }}>
               <form
                 onSubmit={e => {
                   e.preventDefault();

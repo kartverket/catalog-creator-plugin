@@ -9493,12 +9493,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kartverket/plugin-catalog-creator@workspace:plugins/catalog-creator"
   dependencies:
+    "@backstage/catalog-model": "backstage:^"
     "@backstage/cli": "npm:^0.33.1"
     "@backstage/core-app-api": "npm:^1.16.1"
     "@backstage/core-components": "npm:^0.17.1"
     "@backstage/core-plugin-api": "npm:^1.10.5"
     "@backstage/dev-utils": "npm:^1.1.12"
     "@backstage/plugin-catalog-import": "backstage:^"
+    "@backstage/plugin-catalog-react": "backstage:^"
     "@backstage/test-utils": "npm:^1.7.7"
     "@backstage/theme": "npm:^0.6.5"
     "@backstage/ui": "backstage:^"

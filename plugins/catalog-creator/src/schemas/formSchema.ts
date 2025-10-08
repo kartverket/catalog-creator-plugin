@@ -23,7 +23,7 @@ export const entitySchema = z.object({
     .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
   lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
   entityType: z
-    .string()
+    .string('Add a type')
     .trim()
     .min(1, 'Add a type')
     .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),

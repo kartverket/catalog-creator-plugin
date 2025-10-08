@@ -16,17 +16,6 @@ const baseEntitySchema = z.object({
         ),
       'Name cannot start or end with special characters',
     ),
-  owner: z
-    .string()
-    .trim()
-    .min(1, 'Add an owner')
-    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
-  lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
-  entityType: z
-    .string('Add a type')
-    .trim()
-    .min(1, 'Add a type')
-    .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),
 });
 
 export const componentSchema = baseEntitySchema.extend({
@@ -39,25 +28,37 @@ export const componentSchema = baseEntitySchema.extend({
         message: 'System cannot contain space',
       }),
   ),
-  // providesApis: z
-  //   .string()
-  //   .transform(value => value.split(','))
-  //   .pipe(z.array(z.string().trim()))
-  //   .optional(),
-  // consumesApis: z
-  //   .string()
-  //   .transform(value => value.split(','))
-  //   .pipe(z.array(z.string().trim()))
-  //   .optional(),
-  // dependsOn: z
-  //   .string()
-  //   .transform(value => value.split(','))
-  //   .pipe(z.array(z.string().trim()))
-  //   .optional(),
+  owner: z
+    .string()
+    .trim()
+    .min(1, 'Add an owner')
+    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
+  lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
+  entityType: z
+    .string('Add a type')
+    .trim()
+    .min(1, 'Add a type')
+    .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),
+  subcomponentOf: z.string().optional(),
+  providesApis: z.string().optional(),
+  consumesApis: z.string().optional(),
+  dependsOn: z.string().optional(),
+  depencencyOf: z.string().optional(),
 });
 
 export const apiSchema = baseEntitySchema.extend({
   kind: z.literal('API'),
+  owner: z
+    .string()
+    .trim()
+    .min(1, 'Add an owner')
+    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
+  lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
+  entityType: z
+    .string('Add a type')
+    .trim()
+    .min(1, 'Add a type')
+    .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),
   system: z.optional(
     z
       .string()
@@ -68,9 +69,29 @@ export const apiSchema = baseEntitySchema.extend({
   ),
 });
 
+export const templateSchema = baseEntitySchema.extend({
+  kind: z.literal('Template'),
+});
+
+export const systemSchema = baseEntitySchema.extend({
+  kind: z.literal('System'),
+});
+
+export const domainSchema = baseEntitySchema.extend({
+  kind: z.literal('Domain'),
+});
+
+export const resourceSchema = baseEntitySchema.extend({
+  kind: z.literal('Resource'),
+});
+
 export const entitySchema = z.discriminatedUnion('kind', [
   componentSchema,
   apiSchema,
+  templateSchema,
+  systemSchema,
+  domainSchema,
+  resourceSchema,
 ]);
 
 export const formSchema = z.object({

@@ -1,6 +1,11 @@
 import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
 
-import type { FormEntity, kind, RequiredYamlFields } from '../../model/types';
+import type {
+  EntityErrors,
+  FormEntity,
+  kind,
+  RequiredYamlFields,
+} from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
@@ -84,6 +89,32 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     append(entity);
   };
 
+  const getEntityForm = (
+    entity: z.infer<typeof entitySchema>,
+    index: number,
+  ) => {
+    switch (entity.kind) {
+      case 'Component':
+        return (
+          <ComponentForm
+            index={index}
+            control={control}
+            errors={errors?.entities?.[index] as EntityErrors<'Component'>}
+          />
+        );
+      case 'API':
+        return (
+          <ApiForm
+            index={index}
+            control={control}
+            errors={errors?.entities?.[index] as EntityErrors<'API'>}
+          />
+        );
+      default:
+        return <p>No valid form kind was provided</p>;
+    }
+  };
+
   return (
     <>
       <form
@@ -128,16 +159,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       </Button>
                     )}
                   </Flex>
-                  {entity.kind === 'Component' && (
-                    <ComponentForm
-                      index={index}
-                      control={control}
-                      errors={errors}
-                    />
-                  )}
-                  {entity.kind === 'API' && (
-                    <ApiForm index={index} control={control} errors={errors} />
-                  )}
+                  {getEntityForm(entity, index)}
                 </Flex>
               </Card>
             );

@@ -1,9 +1,21 @@
 import { Flex, Select, TextField } from '@backstage/ui';
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
-import { AllowedLifecycleStages, FormProps } from '../../../model/types';
+import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
+import { formSchema } from '../../../schemas/formSchema';
+import z from 'zod/v4';
 
-export const ComponentForm = ({ index, control, errors }: FormProps) => {
+export type ComponentFormProps = {
+  index: number;
+  control: Control<z.infer<typeof formSchema>>;
+  errors: EntityErrors<'Component'>;
+};
+
+export const ComponentForm = ({
+  index,
+  control,
+  errors,
+}: ComponentFormProps) => {
   return (
     <Flex direction="column" justify="start">
       <div>
@@ -19,10 +31,10 @@ export const ComponentForm = ({ index, control, errors }: FormProps) => {
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors.entities?.[index]?.name ? 'visible' : 'hidden',
+            visibility: errors?.name ? 'visible' : 'hidden',
           }}
         >
-          {errors.entities?.[index]?.name?.message || '\u00A0'}
+          {errors?.name?.message || '\u00A0'}
         </span>
       </div>
       <div>
@@ -44,10 +56,10 @@ export const ComponentForm = ({ index, control, errors }: FormProps) => {
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors.entities?.[index]?.owner ? 'visible' : 'hidden',
+            visibility: errors?.owner ? 'visible' : 'hidden',
           }}
         >
-          {errors.entities?.[index]?.owner?.message || '\u00A0'}
+          {errors?.owner?.message || '\u00A0'}
         </span>
       </div>
 
@@ -78,12 +90,10 @@ export const ComponentForm = ({ index, control, errors }: FormProps) => {
             style={{
               color: 'red',
               fontSize: '0.75rem',
-              visibility: errors.entities?.[index]?.lifecycle
-                ? 'visible'
-                : 'hidden',
+              visibility: errors?.lifecycle ? 'visible' : 'hidden',
             }}
           >
-            {errors.entities?.[index]?.lifecycle?.message || '\u00A0'}
+            {errors?.lifecycle?.message || '\u00A0'}
           </span>
         </div>
 
@@ -105,12 +115,10 @@ export const ComponentForm = ({ index, control, errors }: FormProps) => {
             style={{
               color: 'red',
               fontSize: '0.75rem',
-              visibility: errors.entities?.[index]?.entityType
-                ? 'visible'
-                : 'hidden',
+              visibility: errors?.entityType ? 'visible' : 'hidden',
             }}
           >
-            {errors.entities?.[index]?.entityType?.message || '\u00A0'}
+            {errors?.entityType?.message || '\u00A0'}
           </span>
         </div>
       </Flex>
@@ -133,10 +141,29 @@ export const ComponentForm = ({ index, control, errors }: FormProps) => {
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors.entities?.[index]?.system ? 'visible' : 'hidden',
+            visibility: errors?.system ? 'visible' : 'hidden',
           }}
         >
-          {errors.entities?.[index]?.system?.message || '\u00A0'}
+          {errors?.system?.message || '\u00A0'}
+        </span>
+      </div>
+      <div>
+        <Controller
+          name={`entities.${index}.providesApis`}
+          control={control}
+          render={({ field }) => (
+            <TextField {...field} name="Name" label="Provides APIs" />
+          )}
+        />
+
+        <span
+          style={{
+            color: 'red',
+            fontSize: '0.75rem',
+            visibility: errors?.name ? 'visible' : 'hidden',
+          }}
+        >
+          {errors?.name?.message || '\u00A0'}
         </span>
       </div>
     </Flex>

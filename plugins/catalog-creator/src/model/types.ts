@@ -67,3 +67,14 @@ export type FormProps = {
   control: Control<z.infer<typeof formSchema>>;
   errors: FieldErrors<z.infer<typeof formSchema>>;
 };
+
+type entity = z.infer<typeof entitySchema>;
+
+type ExtractEntity<T extends z.infer<typeof entitySchema>['kind']> = Extract<
+  entity,
+  { kind: T }
+>;
+
+export type EntityErrors<T extends entity['kind']> = FieldErrors<
+  ExtractEntity<T>
+>;

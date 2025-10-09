@@ -11,7 +11,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 import { entitySchema, formSchema } from '../../schemas/formSchema';
-import { useState } from 'react';
 import { ComponentForm } from './Forms/ComponentForm';
 import { ApiForm } from './Forms/ApiForm';
 import useAsync from 'react-use/esm/useAsync';
@@ -19,6 +18,7 @@ import useAsync from 'react-use/esm/useAsync';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
 import { Entity } from '@backstage/catalog-model';
+import { useState } from 'react';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -63,6 +63,9 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
               lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
               entityType: entry.spec.type as string,
               system: entry.spec.system,
+              providesApis: entry.spec.providesApis,
+              consumesApis: entry.spec.consumesApis,
+              dependencyOf: entry.spec.dependencyOf,
             };
           })
         : [

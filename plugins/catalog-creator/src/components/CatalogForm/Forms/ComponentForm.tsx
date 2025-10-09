@@ -5,6 +5,11 @@ import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
+import { useAsync } from 'react-use';
+import { useApi } from '@backstage/core-plugin-api';
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import Autocomplete from '@mui/material/Autocomplete';
+import MuiTextField from '@mui/material/TextField';
 
 export type ComponentFormProps = {
   index: number;
@@ -21,6 +26,24 @@ export const ComponentForm = ({
   owners,
   systems,
 }: ComponentFormProps) => {
+  const catalogApi = useApi(catalogApiRef);
+
+  const fetchAPIs = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'API',
+      },
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
+  const fetchComponentsAndResources = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: [{ kind: 'Component' }, { kind: 'Resources' }],
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
   return (
     <Flex direction="column" justify="start">
       <div>
@@ -155,11 +178,38 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
+        <p style={{ fontSize: '0.75rem' }}>Provides APIs</p>
         <Controller
           name={`entities.${index}.providesApis`}
           control={control}
-          render={({ field }) => (
-            <TextField {...field} name="ProvidesApis" label="Provides APIs" />
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Autocomplete
+              multiple
+              freeSolo
+              value={value || []}
+              onBlur={onBlur}
+              onChange={(_, newValue) => {
+                onChange(newValue);
+              }}
+              options={
+                fetchAPIs.value?.map(entity => entity.metadata.name) || []
+              }
+              getOptionLabel={api => api}
+              size="small"
+              renderInput={params => (
+                <MuiTextField
+                  {...params}
+                  placeholder="Select or create API..."
+                  InputProps={{
+                    ...params.InputProps,
+                    sx: {
+                      fontSize: '0.85rem',
+                      font: 'system-ui',
+                    },
+                  }}
+                />
+              )}
+            />
           )}
         />
 
@@ -174,11 +224,38 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
+        <p style={{ fontSize: '0.75rem' }}>Consumes APIs</p>
         <Controller
           name={`entities.${index}.consumesApis`}
           control={control}
-          render={({ field }) => (
-            <TextField {...field} name="ConsumesApis" label="Consumes APIs" />
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Autocomplete
+              multiple
+              freeSolo
+              value={value || []}
+              onBlur={onBlur}
+              onChange={(_, newValue) => {
+                onChange(newValue);
+              }}
+              options={
+                fetchAPIs.value?.map(entity => entity.metadata.name) || []
+              }
+              getOptionLabel={api => api}
+              size="small"
+              renderInput={params => (
+                <MuiTextField
+                  {...params}
+                  placeholder="Select or create API..."
+                  InputProps={{
+                    ...params.InputProps,
+                    sx: {
+                      fontSize: '0.85rem',
+                      font: 'system-ui',
+                    },
+                  }}
+                />
+              )}
+            />
           )}
         />
 
@@ -193,11 +270,47 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
+        <p style={{ fontSize: '0.75rem' }}>Dependens on</p>
         <Controller
           name={`entities.${index}.dependsOn`}
           control={control}
-          render={({ field }) => (
-            <TextField {...field} name="DependsOn" label="Depends on" />
+          render={({ field: { onChange, onBlur, value } }) => (
+            <Autocomplete
+              multiple
+              freeSolo
+              value={value || []}
+              onBlur={onBlur}
+              onChange={(_, newValue) => {
+                onChange(newValue);
+              }}
+              options={
+                fetchComponentsAndResources.value?.map(
+                  entity => entity.metadata.name,
+                ) || []
+              }
+              getOptionLabel={api => api}
+              size="small"
+              sx={{
+                '& .MuiInputBase-input': {
+                  fontSize: 10,
+                  height: 1,
+                  padding: 1,
+                },
+              }}
+              renderInput={params => (
+                <MuiTextField
+                  {...params}
+                  placeholder="Select or create resource or component..."
+                  InputProps={{
+                    ...params.InputProps,
+                    sx: {
+                      fontSize: '0.85rem',
+                      font: 'system-ui',
+                    },
+                  }}
+                />
+              )}
+            />
           )}
         />
 
@@ -205,10 +318,10 @@ export const ComponentForm = ({
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors?.dependsOn ? 'visible' : 'hidden',
+            visibility: errors?.depencencyOf ? 'visible' : 'hidden',
           }}
         >
-          {errors?.dependsOn?.message || '\u00A0'}
+          {errors?.depencencyOf?.message || '\u00A0'}
         </span>
       </div>
     </Flex>

@@ -40,10 +40,37 @@ export const componentSchema = baseEntitySchema.extend({
     .min(1, 'Add a type')
     .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),
   subcomponentOf: z.string().optional(),
-  providesApis: z.string().optional(),
-  consumesApis: z.string().optional(),
-  dependsOn: z.string().optional(),
-  depencencyOf: z.string().optional(),
+  providesApis: z
+    .array(
+      z
+        .string()
+        .min(1, 'Must contain something')
+        .trim()
+        .refine(s => !s.includes(' ')),
+      { message: 'APIs cannot contain space' },
+    )
+    .optional(),
+  consumesApis: z
+    .array(
+      z
+        .string()
+        .min(1, 'Must contain something')
+        .trim()
+        .refine(s => !s.includes(' ')),
+      { message: 'APIs cannot contain space' },
+    )
+    .optional(),
+  dependsOn: z.array(z.string()).optional(),
+  depencencyOf: z
+    .array(
+      z
+        .string()
+        .min(1, 'Must contain something')
+        .trim()
+        .refine(s => !s.includes(' ')),
+      { message: 'APIs cannot contain space' },
+    )
+    .optional(),
 });
 
 export const apiSchema = baseEntitySchema.extend({

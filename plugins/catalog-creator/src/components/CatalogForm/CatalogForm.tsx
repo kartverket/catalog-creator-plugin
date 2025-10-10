@@ -3,7 +3,7 @@ import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
 import type {
   EntityErrors,
   FormEntity,
-  kind,
+  Kind,
   RequiredYamlFields,
 } from '../../model/types';
 import { AllowedLifecycleStages, AllowedEntityKinds } from '../../model/types';
@@ -57,7 +57,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         ? currentYaml.map((entry: RequiredYamlFields, index) => {
             return {
               id: index,
-              kind: entry.kind as kind,
+              kind: entry.kind as Kind,
               name: entry.metadata.name,
               owner: entry.spec.owner,
               lifecycle: entry.spec.lifecycle as AllowedLifecycleStages,
@@ -87,12 +87,12 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     control,
   });
   const [indexCount, setIndexCount] = useState(fields.length);
-  const [addEntityKind, setAddEntityKind] = useState<kind>('Component');
+  const [addEntityKind, setAddEntityKind] = useState<Kind>('Component');
 
   const appendHandler = () => {
     let entity: z.infer<typeof entitySchema>;
     switch (addEntityKind) {
-      case 'Component' as kind:
+      case 'Component' as Kind:
         entity = {
           id: indexCount,
           kind: addEntityKind,
@@ -103,7 +103,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           system: '',
         };
         break;
-      case 'API' as kind:
+      case 'API' as Kind:
         entity = {
           id: indexCount,
           kind: addEntityKind,
@@ -220,7 +220,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
               <Select
                 label="Select entity kind"
                 selectedKey={addEntityKind}
-                onSelectionChange={value => setAddEntityKind(value as kind)}
+                onSelectionChange={value => setAddEntityKind(value as Kind)}
                 options={Object.values(AllowedEntityKinds).map(
                   lifecycleStage => ({
                     value: lifecycleStage as string,

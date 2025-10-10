@@ -11,7 +11,7 @@ export enum AllowedEntityKinds {
   Resource = 'Resource',
 }
 
-export type kind = 'Component' | 'API';
+export type Kind = 'Component' | 'API';
 
 export enum AllowedLifecycleStages {
   development = 'development',

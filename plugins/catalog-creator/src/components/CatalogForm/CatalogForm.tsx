@@ -99,7 +99,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           name: '',
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
-          entityType: 'library',
+          entityType: '',
           system: '',
         };
         break;
@@ -110,7 +110,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           name: '',
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
-          entityType: 'library',
+          entityType: '',
           system: '',
         };
     }

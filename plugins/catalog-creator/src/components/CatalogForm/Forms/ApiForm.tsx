@@ -154,6 +154,29 @@ export const ApiForm = ({
           {errors?.system?.message || '\u00A0'}
         </span>
       </div>
+      <div>
+        <Controller
+          name={`entities.${index}.definition`}
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              name="Definition"
+              label="API Definition (path or URL)"
+            />
+          )}
+        />
+
+        <span
+          style={{
+            color: 'red',
+            fontSize: '0.75rem',
+            visibility: errors?.definition ? 'visible' : 'hidden',
+          }}
+        >
+          {errors?.definition?.message || '\u00A0'}
+        </span>
+      </div>
     </Flex>
   );
 };

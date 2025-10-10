@@ -88,6 +88,14 @@ export const apiSchema = baseEntitySchema.extend({
         message: 'System cannot contain space',
       }),
   ),
+  definition: z.optional(
+    z
+      .string()
+      .trim()
+      .refine(s => !s.includes(' '), {
+        message: 'Definition URL cannot contain space',
+      }),
+  ),
 });
 
 export const templateSchema = baseEntitySchema.extend({

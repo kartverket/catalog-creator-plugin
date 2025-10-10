@@ -270,7 +270,7 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Dependens on</p>
+        <p style={{ fontSize: '0.75rem' }}>Depends on</p>
         <Controller
           name={`entities.${index}.dependsOn`}
           control={control}

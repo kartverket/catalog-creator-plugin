@@ -103,6 +103,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           system: '',
         };
         break;
+      case 'API' as kind:
+        entity = {
+          id: indexCount,
+          kind: addEntityKind,
+          name: '',
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: '',
+          system: '',
+          definition: '',
+        };
+        break;
       default:
         entity = {
           id: indexCount,

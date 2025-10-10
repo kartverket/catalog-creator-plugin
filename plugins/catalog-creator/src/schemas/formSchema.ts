@@ -41,36 +41,30 @@ export const componentSchema = baseEntitySchema.extend({
     .refine(s => !s.includes(' '), { message: 'Type cannot contain space' }),
   subcomponentOf: z.string().optional(),
   providesApis: z
-    .array(
-      z
-        .string()
-        .min(1, 'Must contain something')
-        .trim()
-        .refine(s => !s.includes(' ')),
+    .array(z.string())
+    .refine(
+      entries =>
+        entries.every(entry => entry.trim().length > 0 && !entry.includes(' ')),
       { message: 'APIs cannot contain space' },
     )
     .optional(),
   consumesApis: z
-    .array(
-      z
-        .string()
-        .min(1, 'Must contain something')
-        .trim()
-        .refine(s => !s.includes(' ')),
+    .array(z.string())
+    .refine(
+      entries =>
+        entries.every(entry => entry.trim().length > 0 && !entry.includes(' ')),
       { message: 'APIs cannot contain space' },
     )
     .optional(),
-  dependsOn: z.array(z.string()).optional(),
-  depencencyOf: z
-    .array(
-      z
-        .string()
-        .min(1, 'Must contain something')
-        .trim()
-        .refine(s => !s.includes(' ')),
-      { message: 'APIs cannot contain space' },
+  dependsOn: z
+    .array(z.string())
+    .refine(
+      entries =>
+        entries.every(entry => entry.trim().length > 0 && !entry.includes(' ')),
+      { message: 'Dependencies cannot contain space' },
     )
     .optional(),
+  depencencyOf: z.array(z.string()).optional(),
 });
 
 export const apiSchema = baseEntitySchema.extend({

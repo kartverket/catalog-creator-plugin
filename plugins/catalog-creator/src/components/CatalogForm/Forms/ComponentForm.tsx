@@ -318,10 +318,10 @@ export const ComponentForm = ({
           style={{
             color: 'red',
             fontSize: '0.75rem',
-            visibility: errors?.depencencyOf ? 'visible' : 'hidden',
+            visibility: errors?.dependsOn ? 'visible' : 'hidden',
           }}
         >
-          {errors?.depencencyOf?.message || '\u00A0'}
+          {errors?.dependsOn?.message || '\u00A0'}
         </span>
       </div>
     </Flex>

@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: catalog-creator-api
+spec:
+  type: service
+  owner: skriv
+  lifecycle: production

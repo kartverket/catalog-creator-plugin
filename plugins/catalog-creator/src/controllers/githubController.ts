@@ -1,10 +1,9 @@
-import type { RequiredYamlFields, Status } from '../model/types.ts';
+import type { FormEntity, RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
 import { Octokit } from '@octokit/core';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import { OAuthApi } from '@backstage/core-plugin-api';
-import { FormEntity } from '../schemas/formSchema.ts';
 
 export class GithubController {
   submitCatalogInfoToGithub = async (

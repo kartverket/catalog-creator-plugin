@@ -23,7 +23,7 @@ import { useAsyncFn } from 'react-use';
 import Alert from '@mui/material/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useState } from 'react';
-import { FormEntity } from '../../schemas/formSchema';
+import { FormEntity } from '../../model/types';
 
 export const CatalogCreatorPage = () => {
   const catalogImportApi = useApi(catalogImportApiRef);
@@ -78,10 +78,7 @@ export const CatalogCreatorPage = () => {
           <SupportButton />
         </ContentHeader>
 
-        <Box
-          maxWidth="500px"
-          
-        >
+        <Box maxWidth="500px">
           {repoState.value?.severity === 'success' ? (
             <Card>
               <Box px="2rem">

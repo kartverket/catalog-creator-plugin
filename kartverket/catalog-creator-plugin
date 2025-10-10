@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: catalog-creator
+spec:
+  type: service
+  owner: skvis
+  lifecycle: production
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: catalog-creator-API
+spec:
+  type: API
+  owner: skvis
+  lifecycle: production
+  definition: path

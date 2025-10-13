@@ -69,6 +69,23 @@ export const updateYaml = (
       };
       break;
     }
+    case 'System':
+      updated = {
+        ...initial,
+        kind: form.kind || initial.kind,
+        metadata: {
+          ...initial.metadata,
+          name: form.name || initial.metadata.name,
+        },
+        spec: {
+          ...initial.spec,
+          owner: form.owner || initial.spec.owner || undefined,
+          type: form.entityType?.length
+            ? form.entityType
+            : initial.spec.entityType || undefined,
+        },
+      };
+      break;
     default:
       updated = {
         ...initial,

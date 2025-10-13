@@ -38,7 +38,7 @@ export const updateYaml = (
         },
       };
       break;
-    case 'API':
+    case 'API': {
       updated = {
         ...initial,
         kind: form.kind || initial.kind,
@@ -54,10 +54,14 @@ export const updateYaml = (
             ? form.system
             : initial.spec.system || undefined,
           type: form.entityType! || initial.spec.type,
-          definition: form.definition || initial.spec.definition,
+          definition:
+            (form.definition ?? initial.spec.definition?.$text)
+              ? { $text: form.definition ?? initial.spec.definition?.$text }
+              : undefined,
         },
       };
       break;
+    }
     default:
       updated = {
         ...initial,

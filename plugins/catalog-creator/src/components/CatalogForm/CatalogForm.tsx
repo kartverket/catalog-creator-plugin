@@ -30,6 +30,7 @@ import { Entity } from '@backstage/catalog-model';
 import { useState } from 'react';
 import Divider from '@mui/material/Divider';
 import CatalogSearch from '../CatalogSearch';
+import { SystemForm } from './Forms/SystemForm';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -132,6 +133,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           definition: '',
         };
         break;
+      case 'System' as Kind:
+        entity = {
+          id: indexCount,
+          kind: addEntityKind,
+          name: '',
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: '',
+          system: '',
+          definition: '',
+        };
+        break;
       default:
         entity = {
           id: indexCount,
@@ -168,6 +181,15 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'API'>}
             systems={fetchSystems.value || []}
+          />
+        );
+      case 'System':
+        return (
+          <SystemForm
+            index={index}
+            control={control}
+            errors={errors?.entities?.[index] as EntityErrors<'System'>}
+            owners={fetchOwners.value || []}
           />
         );
       default:

@@ -55,6 +55,11 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
     defaultValues: {
       entities: currentYaml
         ? currentYaml.map((entry: RequiredYamlFields, index) => {
+            const definition =
+              typeof entry.spec.definition !== 'string'
+                ? entry.spec.definition?.$text
+                : undefined;
+
             return {
               id: index,
               kind: entry.kind as Kind,
@@ -66,6 +71,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
               providesApis: entry.spec.providesApis,
               consumesApis: entry.spec.consumesApis,
               dependencyOf: entry.spec.dependencyOf,
+              definition: definition,
             };
           })
         : [

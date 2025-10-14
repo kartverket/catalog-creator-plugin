@@ -39,6 +39,16 @@ export const updateYaml = (
       };
       break;
     case 'API': {
+      let definition;
+
+      if (form.definition) {
+        definition = { $text: form.definition };
+      } else if (initial.spec.definition !== 'string') {
+        definition = initial.spec.definition;
+      } else {
+        definition = initial.spec.definition || undefined;
+      }
+
       updated = {
         ...initial,
         kind: form.kind || initial.kind,
@@ -54,10 +64,7 @@ export const updateYaml = (
             ? form.system
             : initial.spec.system || undefined,
           type: form.entityType! || initial.spec.type,
-          definition:
-            (form.definition ?? initial.spec.definition?.$text)
-              ? { $text: form.definition ?? initial.spec.definition?.$text }
-              : undefined,
+          definition: definition,
         },
       };
       break;

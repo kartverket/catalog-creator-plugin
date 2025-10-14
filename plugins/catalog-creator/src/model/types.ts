@@ -56,9 +56,11 @@ export type RequiredYamlFields = {
     consumesApis?: string[];
     dependsOn?: string[];
     implementsApis?: string[];
-    definition?: {
-      $text: string | undefined;
-    };
+    definition?:
+      | {
+          $text: string | undefined;
+        }
+      | string;
     target?: string;
     [key: string]: any; // Allow additional spec fields
   };

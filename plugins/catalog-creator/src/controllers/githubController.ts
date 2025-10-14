@@ -1,10 +1,9 @@
-import type { RequiredYamlFields, Status } from '../model/types.ts';
+import type { FormEntity, RequiredYamlFields, Status } from '../model/types.ts';
 
 import { updateYaml } from '../translator/translator';
 import { Octokit } from '@octokit/core';
 import { createPullRequest } from 'octokit-plugin-create-pull-request';
 import { OAuthApi } from '@backstage/core-plugin-api';
-import { FormEntity } from '../schemas/formSchema.ts';
 
 export class GithubController {
   submitCatalogInfoToGithub = async (
@@ -26,9 +25,12 @@ export class GithubController {
       },
     };
 
-    const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    const match = url.match(
+      /github\.com\/([^\/]+)\/([^\/]+)\/(blob)\/([^\/]+)\/(.+)/,
+    );
     const owner = match![1];
     const repo = match![2];
+    const relative_path = match![5];
 
     const yamlStrings = catalogInfo.map(val =>
       updateYaml(initialYaml[val.id] ?? emptyRequiredYaml, val),
@@ -39,6 +41,7 @@ export class GithubController {
     const OctokitPlugin = Octokit.plugin(createPullRequest);
     const token = await githubAuthApi.getAccessToken();
     const octokit = new OctokitPlugin({ auth: token });
+
     try {
       await octokit.createPullRequest({
         owner: owner,
@@ -50,7 +53,7 @@ export class GithubController {
         changes: [
           {
             files: {
-              [path]: completeYaml,
+              [relative_path]: completeYaml,
             },
             commit: 'New or updated catalog-info.yaml',
           },

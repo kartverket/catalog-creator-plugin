@@ -1,3 +1,7 @@
+import { Control, FieldErrors } from 'react-hook-form';
+import z from 'zod/v4';
+import { entitySchema, formSchema } from '../schemas/formSchema';
+
 export enum AllowedEntityKinds {
   Component = 'Component',
   API = 'API',
@@ -6,6 +10,8 @@ export enum AllowedEntityKinds {
   Domain = 'Domain',
   Resource = 'Resource',
 }
+
+export type Kind = 'Component' | 'API';
 
 export enum AllowedLifecycleStages {
   development = 'development',
@@ -18,6 +24,8 @@ export type Status = {
   severity: 'error' | 'success' | 'warning' | 'info';
   url?: string;
 };
+
+export type FormEntity = z.infer<typeof entitySchema>;
 
 export type RequiredYamlFields = {
   apiVersion: 'backstage.io/v1alpha1';
@@ -48,8 +56,29 @@ export type RequiredYamlFields = {
     consumesApis?: string[];
     dependsOn?: string[];
     implementsApis?: string[];
-    definition?: string[];
+    definition?:
+      | {
+          $text: string | undefined;
+        }
+      | string;
     target?: string;
     [key: string]: any; // Allow additional spec fields
   };
 };
+
+export type FormProps = {
+  index: number;
+  control: Control<z.infer<typeof formSchema>>;
+  errors: FieldErrors<z.infer<typeof formSchema>>;
+};
+
+type entity = z.infer<typeof entitySchema>;
+
+type ExtractEntity<T extends z.infer<typeof entitySchema>['kind']> = Extract<
+  entity,
+  { kind: T }
+>;
+
+export type EntityErrors<T extends entity['kind']> = FieldErrors<
+  ExtractEntity<T>
+>;

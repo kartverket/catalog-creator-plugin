@@ -1,30 +1,86 @@
-import type { RequiredYamlFields } from '../model/types.ts';
+import z from 'zod/v4';
+import { RequiredYamlFields } from '../model/types.ts';
 import yaml from 'yaml';
-import { FormEntity } from '../schemas/formSchema.ts';
+import { entitySchema } from '../schemas/formSchema.ts';
 
 export const updateYaml = (
   initial: RequiredYamlFields,
-  form: FormEntity,
+  form: z.infer<typeof entitySchema>,
 ): string => {
-  const updated: RequiredYamlFields = {
-    ...initial,
-    kind: form.kind || initial.kind,
-    metadata: {
-      ...initial.metadata,
-      name: form.name || initial.metadata.name,
-    },
-    spec: {
-      ...initial.spec,
-      owner: form.owner || initial.spec.owner || undefined,
-      lifecycle: form.lifecycle || initial.spec.lifecycle || undefined,
-      system: form.system?.length
-        ? form.system
-        : initial.spec.system || undefined,
-      type: form.entityType! || initial.spec.type,
-    },
-  };
+  let updated: RequiredYamlFields;
 
-  const yamlContent = yaml.stringify(updated);
+  switch (form.kind) {
+    case 'Component':
+      updated = {
+        ...initial,
+        kind: form.kind || initial.kind,
+        metadata: {
+          ...initial.metadata,
+          name: form.name || initial.metadata.name,
+        },
+        spec: {
+          ...initial.spec,
+          owner: form.owner || initial.spec.owner || undefined,
+          lifecycle: form.lifecycle || initial.spec.lifecycle || undefined,
+          system: form.system?.length
+            ? form.system
+            : initial.spec.system || undefined,
+          type: form.entityType! || initial.spec.type,
+          providesApis: form.providesApis?.length
+            ? form.providesApis
+            : initial.spec.providesApis || undefined,
+          consumesApis: form.consumesApis?.length
+            ? form.consumesApis
+            : initial.spec.consumesApis || undefined,
+          dependsOn: form.dependsOn?.length
+            ? form.dependsOn
+            : initial.spec.dependsOn || undefined,
+        },
+      };
+      break;
+    case 'API': {
+      let definition;
 
-  return yamlContent;
+      if (form.definition) {
+        definition = { $text: form.definition };
+      } else if (initial.spec.definition !== 'string') {
+        definition = initial.spec.definition;
+      } else {
+        definition = initial.spec.definition || undefined;
+      }
+
+      updated = {
+        ...initial,
+        kind: form.kind || initial.kind,
+        metadata: {
+          ...initial.metadata,
+          name: form.name || initial.metadata.name,
+        },
+        spec: {
+          ...initial.spec,
+          owner: form.owner || initial.spec.owner || undefined,
+          lifecycle: form.lifecycle || initial.spec.lifecycle || undefined,
+          system: form.system?.length
+            ? form.system
+            : initial.spec.system || undefined,
+          type: form.entityType! || initial.spec.type,
+          definition: definition,
+        },
+      };
+      break;
+    }
+    default:
+      updated = {
+        ...initial,
+        kind: form.kind || initial.kind,
+        metadata: {
+          ...initial.metadata,
+          name: form.name || initial.metadata.name,
+        },
+        spec: {
+          ...initial.spec,
+        },
+      };
+  }
+  return yaml.stringify(updated);
 };

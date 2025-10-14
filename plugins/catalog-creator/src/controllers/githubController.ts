@@ -25,9 +25,12 @@ export class GithubController {
       },
     };
 
-    const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    const match = url.match(
+      /github\.com\/([^\/]+)\/([^\/]+)\/(blob)\/([^\/]+)\/(.+)/,
+    );
     const owner = match![1];
     const repo = match![2];
+    const relative_path = match![5];
 
     const yamlStrings = catalogInfo.map(val =>
       updateYaml(initialYaml[val.id] ?? emptyRequiredYaml, val),
@@ -38,6 +41,7 @@ export class GithubController {
     const OctokitPlugin = Octokit.plugin(createPullRequest);
     const token = await githubAuthApi.getAccessToken();
     const octokit = new OctokitPlugin({ auth: token });
+
     try {
       await octokit.createPullRequest({
         owner: owner,
@@ -49,7 +53,7 @@ export class GithubController {
         changes: [
           {
             files: {
-              [path]: completeYaml,
+              [relative_path]: completeYaml,
             },
             commit: 'New or updated catalog-info.yaml',
           },

@@ -12,8 +12,6 @@ export class GithubController {
     catalogInfo: FormEntity[],
     githubAuthApi: OAuthApi,
   ): Promise<Status | undefined> => {
-    const path = new URL(url).pathname.slice(1);
-
     const emptyRequiredYaml: RequiredYamlFields = {
       apiVersion: 'backstage.io/v1alpha1',
       kind: '',

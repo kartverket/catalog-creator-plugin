@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: catalog-creator
+spec:
+  type: service
+  owner: ngf
+  lifecycle: development
+  system: fysak

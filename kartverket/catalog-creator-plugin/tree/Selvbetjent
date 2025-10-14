@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: security-champion-api
+spec:
+  type: service
+  owner: felles_kartdatabase_-_team_lead
+  lifecycle: development
+  system: vegnett

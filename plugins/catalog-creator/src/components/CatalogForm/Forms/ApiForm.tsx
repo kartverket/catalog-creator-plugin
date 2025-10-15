@@ -10,65 +10,13 @@ export type ApiFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'API'>;
-  owners: Entity[];
+  
   systems: Entity[];
 };
 
-export const ApiForm = ({
-  index,
-  control,
-  errors,
-  owners,
-  systems,
-}: ApiFormProps) => {
+export const ApiForm = ({ index, control, errors, systems }: ApiFormProps) => {
   return (
     <Flex direction="column" justify="start">
-      <div>
-        <Controller
-          name={`entities.${index}.name`}
-          control={control}
-          render={({ field }) => (
-            <TextField {...field} name="Name" label="Entity name" isRequired />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.name ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.name?.message || '\u00A0'}
-        </span>
-      </div>
-      <div>
-        <Controller
-          name={`entities.${index}.owner`}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CatalogSearch
-              onChange={onChange}
-              onBlur={onBlur}
-              label="Entity owner"
-              value={value}
-              entityList={owners}
-              isRequired
-            />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.owner ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.owner?.message || '\u00A0'}
-        </span>
-      </div>
-
       <Flex>
         <div>
           <Controller

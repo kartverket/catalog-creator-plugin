@@ -16,6 +16,11 @@ const baseEntitySchema = z.object({
         ),
       'Name cannot start or end with special characters',
     ),
+  owner: z
+    .string()
+    .trim()
+    .min(1, 'Add an owner')
+    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
 });
 
 export const componentSchema = baseEntitySchema.extend({
@@ -28,11 +33,7 @@ export const componentSchema = baseEntitySchema.extend({
         message: 'System cannot contain space',
       }),
   ),
-  owner: z
-    .string()
-    .trim()
-    .min(1, 'Add an owner')
-    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
+
   lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
   entityType: z
     .string('Add a type')
@@ -69,11 +70,7 @@ export const componentSchema = baseEntitySchema.extend({
 
 export const apiSchema = baseEntitySchema.extend({
   kind: z.literal('API'),
-  owner: z
-    .string()
-    .trim()
-    .min(1, 'Add an owner')
-    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
+
   lifecycle: z.enum(AllowedLifecycleStages, { message: 'Choose a lifecycle' }),
   entityType: z
     .string('Add a type')

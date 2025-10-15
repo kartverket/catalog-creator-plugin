@@ -19,8 +19,8 @@ export const ApiForm = ({
   index,
   control,
   errors,
-  owners,
   systems,
+  owners,
 }: ApiFormProps) => {
   return (
     <Flex direction="column" justify="start">

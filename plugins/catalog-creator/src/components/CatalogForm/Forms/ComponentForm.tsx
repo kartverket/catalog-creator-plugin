@@ -16,8 +16,8 @@ export type ComponentFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'Component'>;
-  owners: Entity[];
   systems: Entity[];
+  owners: Entity[];
 };
 
 export const ComponentForm = ({

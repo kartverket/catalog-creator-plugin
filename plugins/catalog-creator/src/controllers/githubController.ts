@@ -12,8 +12,6 @@ export class GithubController {
     catalogInfo: FormEntity[],
     githubAuthApi: OAuthApi,
   ): Promise<Status | undefined> => {
-    const path = new URL(url).pathname.slice(1);
-
     const emptyRequiredYaml: RequiredYamlFields = {
       apiVersion: 'backstage.io/v1alpha1',
       kind: '',
@@ -25,13 +23,6 @@ export class GithubController {
       },
     };
 
-    const match = url.match(
-      /github\.com\/([^\/]+)\/([^\/]+)\/(blob)\/([^\/]+)\/(.+)/,
-    );
-    const owner = match![1];
-    const repo = match![2];
-    const relative_path = match![5];
-
     const yamlStrings = catalogInfo.map(val =>
       updateYaml(initialYaml[val.id] ?? emptyRequiredYaml, val),
     );
@@ -41,6 +32,24 @@ export class GithubController {
     const OctokitPlugin = Octokit.plugin(createPullRequest);
     const token = await githubAuthApi.getAccessToken();
     const octokit = new OctokitPlugin({ auth: token });
+
+    let owner;
+    let repo;
+    let relative_path;
+
+    if (url.includes('blob')) {
+      const match = url.match(
+        /github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree)\/([^\/]+)\/(.+)/,
+      );
+      owner = match![1];
+      repo = match![2];
+      relative_path = match![5];
+    } else {
+      const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)(.*)/);
+      owner = match![1];
+      repo = match![2];
+      relative_path = 'catalog-info.yaml';
+    }
 
     try {
       await octokit.createPullRequest({

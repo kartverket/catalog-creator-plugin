@@ -171,7 +171,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           />
         );
       default:
-        return <p>A form for this kind does not exist</p>;
+        return <></>;
     }
   };
 

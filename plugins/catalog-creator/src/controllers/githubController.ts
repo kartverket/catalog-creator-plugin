@@ -39,11 +39,11 @@ export class GithubController {
 
     if (url.includes('blob')) {
       const match = url.match(
-        /github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree)\/([^\/]+)\/(.+)/,
+        /github\.com\/([^\/]+)\/([^\/]+)\/blob|tree\/[^\/]+\/(.+)/,
       );
       owner = match![1];
       repo = match![2];
-      relative_path = match![5];
+      relative_path = match![3];
     } else {
       const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)(.*)/);
       owner = match![1];

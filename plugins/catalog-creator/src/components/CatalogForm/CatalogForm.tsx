@@ -156,7 +156,6 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'Component'>}
-            
             systems={fetchSystems.value || []}
           />
         );
@@ -166,12 +165,11 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'API'>}
-            
             systems={fetchSystems.value || []}
           />
         );
       default:
-        return <p>A form for this kind does not exist</p>;
+        return <></>;
     }
   };
 

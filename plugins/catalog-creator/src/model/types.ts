@@ -22,7 +22,7 @@ export enum AllowedLifecycleStages {
 export type Status = {
   message: string;
   severity: 'error' | 'success' | 'warning' | 'info';
-  url?: string;
+  pr_url?: string;
 };
 
 export type FormEntity = z.infer<typeof entitySchema>;

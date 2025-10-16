@@ -1,4 +1,4 @@
-import { TextField, Button, Box, Card, Icon, Flex, Link } from '@backstage/ui';
+import { TextField, Button, Box, Card, Icon, Flex } from '@backstage/ui';
 
 import {
   Page,
@@ -24,6 +24,7 @@ import Alert from '@mui/material/Alert';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useState } from 'react';
 import { FormEntity } from '../../model/types';
+import Link from '@mui/material/Link';
 
 export const CatalogCreatorPage = () => {
   const catalogImportApi = useApi(catalogImportApiRef);
@@ -87,10 +88,20 @@ export const CatalogCreatorPage = () => {
                   align={{ xs: 'start', md: 'center' }}
                   py="2rem"
                 >
-                  <Alert sx={{ fontWeight: 'bold' }} severity="success">
-                    Successfully created a pull request{' '}
+                  <Alert
+                    sx={{ fontWeight: 'bold', textAlign: 'center' }}
+                    severity="success"
+                  >
+                    Successfully created a pull request:{' '}
+                    <Link
+                      href={repoState.value.pr_url}
+                      sx={{ fontWeight: 'normal' }}
+                    >
+                      {repoState.value.pr_url}
+                    </Link>
                   </Alert>
                   <Link
+                    color="inherit"
                     onClick={() => {
                       setUrl('');
                       doSubmitToGithub('', undefined);

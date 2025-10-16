@@ -1,5 +1,4 @@
-import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
-
+import { Button, Box, Flex, Select, Icon, Card, Text } from '@backstage/ui';
 import type {
   EntityErrors,
   FormEntity,
@@ -19,6 +18,7 @@ import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { useState } from 'react';
+import Divider from '@mui/material/Divider';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -216,15 +216,13 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             );
           })}
 
-          <Flex
-            direction="row"
-            align="end"
-            justify="between"
-            style={{ paddingTop: '1rem' }}
-          >
-            <Flex align="end">
+          <Flex direction="column">
+            <Text style={{ fontWeight: 'bold', marginTop: '1.5rem' }}>
+              Add Entity
+            </Text>
+            <Flex align="end" justify="start">
               <Select
-                label="Select entity kind"
+                label="Select kind"
                 selectedKey={addEntityKind}
                 onSelectionChange={value => setAddEntityKind(value as Kind)}
                 options={Object.values(AllowedEntityKinds).map(
@@ -234,10 +232,17 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   }),
                 )}
               />
-              <Button type="button" onClick={() => appendHandler()}>
+              <Button
+                type="button"
+                onClick={() => appendHandler()}
+                variant="secondary"
+              >
                 Add Entity
               </Button>
             </Flex>
+          </Flex>
+          <Divider sx={{ marginY: '1.5rem' }} />
+          <Flex justify="end">
             <Button variant="primary" type="submit">
               Create pull request
             </Button>

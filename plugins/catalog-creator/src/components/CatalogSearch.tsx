@@ -11,8 +11,8 @@ interface CatalogSearchProps {
   onChange: (entity: string | null) => void;
   onBlur: () => void;
 
-  label: string;
-  isRequired: boolean;
+ 
+  
 }
 
 export const CatalogSearch = ({
@@ -20,8 +20,6 @@ export const CatalogSearch = ({
   entityList,
   value,
   onBlur,
-  label,
-  isRequired,
 }: CatalogSearchProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -57,8 +55,6 @@ export const CatalogSearch = ({
         <SearchField
           placeholder="Search..."
           value={value}
-          label={label}
-          isRequired={isRequired}
           onChange={input => {
             onChange(input);
           }}

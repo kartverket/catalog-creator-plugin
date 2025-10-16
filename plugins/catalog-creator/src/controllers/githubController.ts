@@ -52,7 +52,7 @@ export class GithubController {
     }
 
     try {
-      await octokit.createPullRequest({
+      const result = await octokit.createPullRequest({
         owner: owner,
         repo: repo,
         title: 'Create/update catalog-info.yaml',
@@ -71,6 +71,7 @@ export class GithubController {
       return {
         message: 'created a pull request',
         severity: 'success',
+        pr_url: result?.data.html_url,
       };
     } catch (error: unknown) {
       if (error instanceof Error) {

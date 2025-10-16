@@ -21,7 +21,7 @@ import { GithubController } from '../../controllers/githubController';
 import { getCatalogInfo } from '../../utils/getCatalogInfo';
 import { useAsyncFn } from 'react-use';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from 'react';
 import { FormEntity } from '../../model/types';
 import Link from '@mui/material/Link';
@@ -93,12 +93,18 @@ export const CatalogCreatorPage = () => {
                     severity="success"
                   >
                     Successfully created a pull request:{' '}
-                    <Link
-                      href={repoState.value.pr_url}
-                      sx={{ fontWeight: 'normal' }}
-                    >
-                      {repoState.value.pr_url}
-                    </Link>
+                    {repoState?.value?.prUrl ? (
+                      <Link
+                        href={repoState.value.prUrl}
+                        sx={{ fontWeight: 'normal' }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {repoState.value.prUrl}
+                      </Link>
+                    ) : (
+                      <p>Could not retrieve pull request URL.</p>
+                    )}
                   </Alert>
                   <Link
                     color="inherit"

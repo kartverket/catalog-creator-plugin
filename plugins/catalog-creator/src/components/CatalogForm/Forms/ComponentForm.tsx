@@ -284,8 +284,10 @@ export const ComponentForm = ({
                 onChange(newValue);
               }}
               options={
-                fetchComponentsAndResources.value?.map(
-                  entity => entity.metadata.name,
+                fetchComponentsAndResources.value?.map(entity =>
+                  entity.metadata.title
+                    ? entity.metadata.title
+                    : entity.metadata.name,
                 ) || []
               }
               getOptionLabel={api => api}

@@ -1,4 +1,4 @@
-import { TextField, Button, Box, Card, Icon, Flex, Link } from '@backstage/ui';
+import { TextField, Button, Box, Card, Icon, Flex } from '@backstage/ui';
 
 import {
   Page,
@@ -21,9 +21,10 @@ import { GithubController } from '../../controllers/githubController';
 import { getCatalogInfo } from '../../utils/getCatalogInfo';
 import { useAsyncFn } from 'react-use';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@material-ui/core/CircularProgress';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from 'react';
 import { FormEntity } from '../../model/types';
+import Link from '@mui/material/Link';
 
 export const CatalogCreatorPage = () => {
   const catalogImportApi = useApi(catalogImportApiRef);
@@ -87,10 +88,26 @@ export const CatalogCreatorPage = () => {
                   align={{ xs: 'start', md: 'center' }}
                   py="2rem"
                 >
-                  <Alert sx={{ fontWeight: 'bold' }} severity="success">
-                    Successfully created a pull request{' '}
+                  <Alert
+                    sx={{ fontWeight: 'bold', textAlign: 'center' }}
+                    severity="success"
+                  >
+                    Successfully created a pull request:{' '}
+                    {repoState?.value?.prUrl ? (
+                      <Link
+                        href={repoState.value.prUrl}
+                        sx={{ fontWeight: 'normal' }}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {repoState.value.prUrl}
+                      </Link>
+                    ) : (
+                      <p>Could not retrieve pull request URL.</p>
+                    )}
                   </Alert>
                   <Link
+                    color="inherit"
                     onClick={() => {
                       setUrl('');
                       doSubmitToGithub('', undefined);

@@ -24,12 +24,14 @@ export const ApiForm = ({
   return (
     <Flex direction="column" justify="start">
       <div>
+        <p style={{ fontSize: '0.75rem' }}>
+          Entity name
+          <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
+        </p>
         <Controller
           name={`entities.${index}.name`}
           control={control}
-          render={({ field }) => (
-            <TextField {...field} name="Name" label="Entity name" isRequired />
-          )}
+          render={({ field }) => <TextField {...field} name="Name" />}
         />
 
         <span
@@ -43,6 +45,10 @@ export const ApiForm = ({
         </span>
       </div>
       <div>
+        <p style={{ fontSize: '0.75rem' }}>
+          Entity owner{' '}
+          <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
+        </p>
         <Controller
           name={`entities.${index}.owner`}
           control={control}
@@ -50,10 +56,8 @@ export const ApiForm = ({
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
-              label="Entity owner"
               value={value}
               entityList={owners}
-              isRequired
             />
           )}
         />
@@ -71,13 +75,16 @@ export const ApiForm = ({
 
       <Flex>
         <div>
+          <p style={{ fontSize: '0.75rem' }}>
+            Entity lifecycle{' '}
+            <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
+          </p>
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <Select
                 name="lifecycle"
-                label="Entity lifecycle"
                 onBlur={onBlur}
                 onSelectionChange={onChange}
                 selectedKey={value}
@@ -87,7 +94,6 @@ export const ApiForm = ({
                     label: lifecycleStage,
                   }),
                 )}
-                isRequired
               />
             )}
           />
@@ -104,17 +110,14 @@ export const ApiForm = ({
         </div>
 
         <div style={{ flexGrow: 1 }}>
+          <p style={{ fontSize: '0.75rem' }}>
+            Entity type{' '}
+            <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
+          </p>
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                name="Entity type"
-                label="Entity type"
-                isRequired
-              />
-            )}
+            render={({ field }) => <TextField {...field} name="Entity type" />}
           />
 
           <span
@@ -129,6 +132,7 @@ export const ApiForm = ({
         </div>
       </Flex>
       <div>
+        <p style={{ fontSize: '0.75rem' }}>Entity system</p>
         <Controller
           name={`entities.${index}.system`}
           control={control}
@@ -136,9 +140,7 @@ export const ApiForm = ({
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
-              label="Entity system"
               entityList={systems}
-              isRequired={false}
               value={value}
             />
           )}

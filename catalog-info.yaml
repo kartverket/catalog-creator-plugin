@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: as
+spec:
+  type: asd
+  owner: hydris_team_3_-_tech_lead
+  lifecycle: production
+  system: smia-dataprodukter

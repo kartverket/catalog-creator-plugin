@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kn
+spec:
+  type: m
+  owner: hydris_team_3_-_tech_lead
+  lifecycle: development
+  system: vegnett
+  providesApis:
+    - initialize-risc-api
+    - sikkerhetsmetrikker-api

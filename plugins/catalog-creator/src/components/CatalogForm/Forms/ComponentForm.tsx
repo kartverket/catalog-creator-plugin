@@ -1,7 +1,11 @@
 import { Flex, Select, TextField } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
-import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
+import {
+  AllowedLifecycleStages,
+  EntityErrors,
+  ComponentTypes,
+} from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
@@ -93,7 +97,7 @@ export const ComponentForm = ({
       </div>
 
       <Flex>
-        <div>
+        <div style={{ width: '50%' }}>
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
@@ -126,15 +130,21 @@ export const ComponentForm = ({
           </span>
         </div>
 
-        <div style={{ flexGrow: 1 }}>
+        <div style={{ flexGrow: 1, width: '50%' }}>
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                name="Entity type"
+            render={({ field: { onBlur, onChange, value } }) => (
+              <Select
+                name="type"
                 label="Entity type"
+                onBlur={onBlur}
+                onSelectionChange={onChange}
+                selectedKey={value}
+                options={Object.values(ComponentTypes).map(lifecycleStage => ({
+                  value: lifecycleStage as string,
+                  label: lifecycleStage,
+                }))}
                 isRequired
               />
             )}

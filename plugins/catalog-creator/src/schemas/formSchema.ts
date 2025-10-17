@@ -101,11 +101,6 @@ export const templateSchema = baseEntitySchema.extend({
 
 export const systemSchema = baseEntitySchema.extend({
   kind: z.literal('System'),
-  owner: z
-    .string()
-    .trim()
-    .min(1, 'Add an owner')
-    .refine(s => !s.includes(' '), { message: 'Owner cannot contain space' }),
   entityType: z.optional(
     z
       .string()

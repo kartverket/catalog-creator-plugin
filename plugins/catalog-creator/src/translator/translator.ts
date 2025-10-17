@@ -83,6 +83,9 @@ export const updateYaml = (
           type: form.entityType?.length
             ? form.entityType
             : initial.spec.entityType || undefined,
+          domain: form.domain?.length
+            ? form.domain
+            : initial.spec.system || undefined,
         },
       };
       break;

@@ -74,7 +74,7 @@ export const ApiForm = ({
       </div>
 
       <Flex>
-        <div>
+        <div style={{ width: '50%' }}>
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
@@ -107,7 +107,7 @@ export const ApiForm = ({
           </span>
         </div>
 
-        <div style={{ flexGrow: 1 }}>
+        <div style={{ flexGrow: 1, width: '50%' }}>
           <Controller
             name={`entities.${index}.entityType`}
             control={control}

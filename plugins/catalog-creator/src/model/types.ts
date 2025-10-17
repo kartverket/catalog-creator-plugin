@@ -11,7 +11,13 @@ export enum AllowedEntityKinds {
   Resource = 'Resource',
 }
 
-export type Kind = 'Component' | 'API';
+const Kinds = {
+  API: 'API',
+  Component: 'Component',
+  System: 'System',
+} as const;
+
+export type Kind = (typeof Kinds)[keyof typeof Kinds];
 
 export enum AllowedLifecycleStages {
   development = 'development',

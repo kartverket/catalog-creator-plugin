@@ -1,4 +1,12 @@
-import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
+import {
+  Button,
+  Box,
+  Flex,
+  Select,
+  Icon,
+  Card,
+  TextField,
+} from '@backstage/ui';
 
 import type {
   EntityErrors,
@@ -19,6 +27,8 @@ import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { useState } from 'react';
+import CatalogSearch from '../CatalogSearch';
+import { SystemForm } from './Forms/SystemForm';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -121,6 +131,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
           definition: '',
         };
         break;
+      case 'System' as Kind:
+        entity = {
+          id: indexCount,
+          kind: addEntityKind,
+          name: '',
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: '',
+          system: '',
+          definition: '',
+        };
+        break;
       default:
         entity = {
           id: indexCount,
@@ -147,7 +169,6 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'Component'>}
-            owners={fetchOwners.value || []}
             systems={fetchSystems.value || []}
           />
         );
@@ -157,12 +178,20 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'API'>}
-            owners={fetchOwners.value || []}
             systems={fetchSystems.value || []}
           />
         );
+      case 'System':
+        return (
+          <SystemForm
+            index={index}
+            control={control}
+            errors={errors?.entities?.[index] as EntityErrors<'System'>}
+            owners={fetchOwners.value || []}
+          />
+        );
       default:
-        return <p>A form for this kind does not exist</p>;
+        return <></>;
     }
   };
 
@@ -210,6 +239,59 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       </Button>
                     )}
                   </Flex>
+
+                  <div>
+                    <Controller
+                      name={`entities.${index}.name`}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          name="Name"
+                          label="Entity name"
+                          isRequired
+                        />
+                      )}
+                    />
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors?.entities ? 'visible' : 'hidden',
+                      }}
+                    >
+                      {errors?.entities?.[index]?.name?.message || '\u00A0'}
+                    </span>
+                  </div>
+
+                  <div>
+                    <Controller
+                      name={`entities.${index}.owner`}
+                      control={control}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <CatalogSearch
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          label="Entity owner"
+                          value={value}
+                          isRequired
+                          entityList={fetchOwners.value || []}
+                        />
+                      )}
+                    />
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors?.entities ? 'visible' : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.owner?.message || '\u00A0'}
+                    </span>
+                  </div>
+
                   {getEntityForm(entity, index)}
                 </Flex>
               </Card>

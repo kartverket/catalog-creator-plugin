@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: asd
+spec:
+  type: asd
+  owner: hydris_team_3_-_tech_lead
+  lifecycle: production

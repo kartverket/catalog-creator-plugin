@@ -1,6 +1,5 @@
 import { Flex, TextField } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
-import CatalogSearch from '../../CatalogSearch';
 import { EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
@@ -13,60 +12,9 @@ export type SystemFormProps = {
   owners: Entity[];
 };
 
-export const SystemForm = ({
-  index,
-  control,
-  errors,
-  owners,
-}: SystemFormProps) => {
+export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
   return (
     <Flex direction="column" justify="start">
-      <div>
-        <Controller
-          name={`entities.${index}.name`}
-          control={control}
-          render={({ field }) => (
-            <TextField {...field} name="Name" label="Entity name" isRequired />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.name ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.name?.message || '\u00A0'}
-        </span>
-      </div>
-      <div>
-        <Controller
-          name={`entities.${index}.owner`}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CatalogSearch
-              onChange={onChange}
-              onBlur={onBlur}
-              label="Entity owner"
-              value={value}
-              entityList={owners}
-              isRequired
-            />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.owner ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.owner?.message || '\u00A0'}
-        </span>
-      </div>
-
       <Flex>
         <div style={{ flexGrow: 1 }}>
           <Controller

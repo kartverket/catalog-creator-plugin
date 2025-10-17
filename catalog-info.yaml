@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: catalog-creator
+spec:
+  type: service
+  owner: skvis
+  lifecycle: development
+  system: sikkerhetsmetrikker
+
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: catalog-creator-system
+spec:
+  type: service
+  owner: skvis

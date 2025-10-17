@@ -14,6 +14,7 @@ export enum AllowedEntityKinds {
 const Kinds = {
   API: 'API',
   Component: 'Component',
+  System: 'System',
 } as const;
 
 export type Kind = (typeof Kinds)[keyof typeof Kinds];

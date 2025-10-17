@@ -4,6 +4,10 @@ import { EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
+import CatalogSearch from '../../CatalogSearch';
+import { useAsync } from 'react-use';
+import { useApi } from '@backstage/core-plugin-api';
+import { catalogApiRef } from '@backstage/plugin-catalog-react';
 
 export type SystemFormProps = {
   index: number;
@@ -13,6 +17,16 @@ export type SystemFormProps = {
 };
 
 export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
+  const catalogApi = useApi(catalogApiRef);
+  const fetchDomains = useAsync(async () => {
+    const results = await catalogApi.getEntities({
+      filter: {
+        kind: 'Domain',
+      },
+    });
+    return results.items as Entity[];
+  }, [catalogApi]);
+
   return (
     <Flex direction="column" justify="start">
       <Flex>
@@ -36,6 +50,32 @@ export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
           </span>
         </div>
       </Flex>
+      <div>
+        <Controller
+          name={`entities.${index}.domain`}
+          control={control}
+          render={({ field: { onChange, onBlur, value } }) => (
+            <CatalogSearch
+              onChange={onChange}
+              onBlur={onBlur}
+              label="Entity domain"
+              value={value}
+              isRequired={false}
+              entityList={fetchDomains.value || []}
+            />
+          )}
+        />
+
+        <span
+          style={{
+            color: 'red',
+            fontSize: '0.75rem',
+            visibility: errors?.domain ? 'visible' : 'hidden',
+          }}
+        >
+          {errors?.domain?.message || '\u00A0'}
+        </span>
+      </div>
     </Flex>
   );
 };

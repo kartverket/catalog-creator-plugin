@@ -27,8 +27,9 @@ export const CatalogSearch = ({
 
   const filteredEntities =
     value !== undefined
-      ? entityList.filter(({ metadata: { name } }) => {
-          return name.includes(value.toLowerCase());
+      ? entityList.filter(({ metadata }) => {
+          const titleOrName = metadata.title ?? metadata.name;
+          return titleOrName.toLowerCase().includes(value.toLowerCase());
         })
       : entityList;
 
@@ -87,7 +88,9 @@ export const CatalogSearch = ({
                     onBlur();
                   }}
                 >
-                  <ListItemText primary={entity.metadata.name} />
+                  <ListItemText
+                    primary={entity.metadata.title ?? entity.metadata.name}
+                  />
                 </ListItemButton>
               ))}
             </List>

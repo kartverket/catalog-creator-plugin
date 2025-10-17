@@ -189,12 +189,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item =>
+                  typeof item === 'string' ? item : item.metadata.name,
+                );
+                onChange(names);
               }}
-              options={
-                fetchAPIs.value?.map(entity => entity.metadata.name) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchAPIs.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               renderInput={params => (
                 <MuiTextField
@@ -235,12 +248,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item =>
+                  typeof item === 'string' ? item : item.metadata.name,
+                );
+                onChange(names);
               }}
-              options={
-                fetchAPIs.value?.map(entity => entity.metadata.name) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchAPIs.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               renderInput={params => (
                 <MuiTextField
@@ -281,16 +307,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item =>
+                  typeof item === 'string' ? item : item.metadata.name,
+                );
+                onChange(names);
               }}
-              options={
-                fetchComponentsAndResources.value?.map(entity =>
-                  entity.metadata.title
-                    ? entity.metadata.title
-                    : entity.metadata.name,
-                ) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchComponentsAndResources.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               sx={{
                 '& .MuiInputBase-input': {

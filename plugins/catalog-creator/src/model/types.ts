@@ -19,6 +19,19 @@ export enum AllowedLifecycleStages {
   deprecated = 'deprecated',
 }
 
+export enum ComponentTypes {
+  service = 'service',
+  website = 'website',
+  library = 'library',
+}
+
+export enum ApiTypes {
+  openapi = 'openapi',
+  asyncapi = 'asyncapi',
+  graphql = 'graphql',
+  grpc = 'grpc',
+}
+
 export type Status = {
   message: string;
   severity: 'error' | 'success' | 'warning' | 'info';

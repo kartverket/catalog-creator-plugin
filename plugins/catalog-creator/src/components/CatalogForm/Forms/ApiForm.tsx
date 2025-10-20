@@ -5,6 +5,7 @@ import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
 import { formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
+import { FieldHeader } from '../FieldHeader';
 
 export type ApiFormProps = {
   index: number;
@@ -24,10 +25,11 @@ export const ApiForm = ({
   return (
     <Flex direction="column" justify="start">
       <div>
-        <p style={{ fontSize: '0.75rem' }}>
-          Entity name
-          <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
-        </p>
+        <FieldHeader
+          fieldName="Name"
+          required
+          tooltipText="The name of the API entity. This name is both meant for human eyes to recognize the entity, and for machines and other components to reference the entity. Must be unique"
+        />
         <Controller
           name={`entities.${index}.name`}
           control={control}
@@ -45,10 +47,11 @@ export const ApiForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>
-          Entity owner{' '}
-          <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
-        </p>
+        <FieldHeader
+          fieldName="Owner"
+          tooltipText="A reference to the owner (commonly a team), that bears ultimate responsibility for the API, and has the authority and capability to develop and maintain it"
+          required
+        />
         <Controller
           name={`entities.${index}.owner`}
           control={control}
@@ -75,10 +78,11 @@ export const ApiForm = ({
 
       <Flex>
         <div>
-          <p style={{ fontSize: '0.75rem' }}>
-            Entity lifecycle{' '}
-            <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
-          </p>
+          <FieldHeader
+            fieldName="Lifecycle"
+            tooltipText="The lifecycle state of the API"
+            required
+          />
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
@@ -110,10 +114,11 @@ export const ApiForm = ({
         </div>
 
         <div style={{ flexGrow: 1 }}>
-          <p style={{ fontSize: '0.75rem' }}>
-            Entity type{' '}
-            <span style={{ color: '#FF0000', fontSize: '1rem' }}>*</span>
-          </p>
+          <FieldHeader
+            fieldName="Type"
+            tooltipText="The type of the API."
+            required
+          />
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
@@ -132,7 +137,10 @@ export const ApiForm = ({
         </div>
       </Flex>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Entity system</p>
+        <FieldHeader
+          fieldName="System"
+          tooltipText="Reference to the system which the component belongs to"
+        />
         <Controller
           name={`entities.${index}.system`}
           control={control}
@@ -157,16 +165,14 @@ export const ApiForm = ({
         </span>
       </div>
       <div>
+        <FieldHeader
+          fieldName="API Definition (path or URL)"
+          tooltipText="Relative path to the API definition file (OpenAPI, AsyncAPI, GraphQL, or gRPC). Required for new APIs. If editing an existing API this field may already be populated, check the existing catalog-info.yaml"
+        />
         <Controller
           name={`entities.${index}.definition`}
           control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              name="Definition"
-              label="API Definition (path or URL)"
-            />
-          )}
+          render={({ field }) => <TextField {...field} name="Definition" />}
         />
 
         <span

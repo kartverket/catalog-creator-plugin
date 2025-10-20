@@ -37,6 +37,7 @@
     "@backstage/theme": "^0.6.5",
     "@backstage/ui": "backstage:^",
     "@hookform/resolvers": "^5.2.2",
+    "@mui/icons-material": "^7.3.4",
     "@octokit/core": "^7.0.5",
     "@octokit/rest": "^22.0.0",
     "octokit-plugin-create-pull-request": "^6.0.1",

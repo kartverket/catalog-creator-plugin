@@ -104,14 +104,14 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
   const [indexCount, setIndexCount] = useState(fields.length);
   const [addEntityKind, setAddEntityKind] = useState<Kind>('Component');
 
-  const appendHandler = () => {
+  const appendHandler = (entityKindToAdd: Kind, name = '') => {
     let entity: z.infer<typeof entitySchema>;
-    switch (addEntityKind) {
+    switch (entityKindToAdd) {
       case 'Component' as Kind:
         entity = {
           id: indexCount,
-          kind: addEntityKind,
-          name: '',
+          kind: entityKindToAdd,
+          name: name,
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
           entityType: '',
@@ -121,8 +121,8 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
       case 'API' as Kind:
         entity = {
           id: indexCount,
-          kind: addEntityKind,
-          name: '',
+          kind: entityKindToAdd,
+          name: name,
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
           entityType: '',
@@ -134,7 +134,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         entity = {
           id: indexCount,
           kind: addEntityKind,
-          name: '',
+          name: name,
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
           entityType: '',
@@ -156,6 +156,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'Component'>}
+            appendHandler={appendHandler}
             systems={fetchSystems.value || []}
           />
         );
@@ -294,7 +295,10 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   }),
                 )}
               />
-              <Button type="button" onClick={() => appendHandler()}>
+              <Button
+                type="button"
+                onClick={() => appendHandler(addEntityKind)}
+              >
                 Add Entity
               </Button>
             </Flex>

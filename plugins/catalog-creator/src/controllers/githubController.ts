@@ -37,42 +37,49 @@ export class GithubController {
     let repo;
     let relative_path;
 
-    if (url.includes('blob')) {
+    if (url.includes('blob') || url.includes('tree')) {
       const match = url.match(
-        /github\.com\/([^\/]+)\/([^\/]+)\/blob|tree\/[^\/]+\/(.+)/,
+        /github\.com\/([^\/]+)\/([^\/]+)\/(blob|tree)\/[^\/]+\/(.+)/,
       );
-      owner = match![1];
-      repo = match![2];
-      relative_path = match![3];
+      if (match) {
+        owner = match[1];
+        repo = match[2];
+        relative_path = match[4] ? match[4] : 'catalog-info.yaml';
+      }
     } else {
       const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)(.*)/);
-      owner = match![1];
-      repo = match![2];
-      relative_path = 'catalog-info.yaml';
+      if (match) {
+        owner = match[1];
+        repo = match[2];
+        relative_path = match[3] ? match[3] : 'catalog-info.yaml';
+      }
     }
 
     try {
-      const result = await octokit.createPullRequest({
-        owner: owner,
-        repo: repo,
-        title: 'Create/update catalog-info.yaml',
-        body: 'Creates or updates catalog-info.yaml',
-        base: 'main',
-        head: 'Update-or-create-catalog-info',
-        changes: [
-          {
-            files: {
-              [relative_path]: completeYaml,
+      if (owner && repo && relative_path) {
+        const result = await octokit.createPullRequest({
+          owner: owner,
+          repo: repo,
+          title: 'Create/update catalog-info.yaml',
+          body: 'Creates or updates catalog-info.yaml',
+          base: 'main',
+          head: 'Update-or-create-catalog-info',
+          changes: [
+            {
+              files: {
+                [relative_path]: completeYaml,
+              },
+              commit: 'New or updated catalog-info.yaml',
             },
-            commit: 'New or updated catalog-info.yaml',
-          },
-        ],
-      });
-      return {
-        message: 'created a pull request',
-        severity: 'success',
-        prUrl: result?.data.html_url,
-      };
+          ],
+        });
+        return {
+          message: 'created a pull request',
+          severity: 'success',
+          prUrl: result?.data.html_url,
+        };
+      }
+      throw new Error();
     } catch (error: unknown) {
       if (error instanceof Error) {
         error.message =

@@ -35,9 +35,14 @@ import { SystemForm } from './Forms/SystemForm';
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
   currentYaml: RequiredYamlFields[] | null;
+  defaultName?: string;
 };
 
-export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
+export const CatalogForm = ({
+  onSubmit,
+  currentYaml,
+  defaultName = '',
+}: CatalogFormProps) => {
   const catalogApi = useApi(catalogApiRef);
 
   const fetchOwners = useAsync(async () => {
@@ -90,7 +95,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             {
               id: 0,
               kind: 'Component',
-              name: '',
+              name: defaultName,
               owner: '',
             },
           ],

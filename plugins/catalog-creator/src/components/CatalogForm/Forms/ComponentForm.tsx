@@ -1,4 +1,4 @@
-import { Flex, Select, TextField, Icon } from '@backstage/ui';
+import { Flex, Select, TextField } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
 import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';

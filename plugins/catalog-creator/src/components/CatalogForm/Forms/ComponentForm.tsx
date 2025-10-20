@@ -1,4 +1,4 @@
-import { Flex, Select, TextField } from '@backstage/ui';
+import { Flex, Select, TextField, Icon } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
 import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
@@ -10,6 +10,7 @@ import { useApi } from '@backstage/core-plugin-api';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import Autocomplete from '@mui/material/Autocomplete';
 import MuiTextField from '@mui/material/TextField';
+import { FieldHeader } from '../FieldHeader';
 
 export type ComponentFormProps = {
   index: number;
@@ -47,10 +48,11 @@ export const ComponentForm = ({
   return (
     <Flex direction="column" justify="start">
       <div>
-        <p style={{ fontSize: '0.75rem' }}>
-          Entity name
-          <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
-        </p>
+        <FieldHeader
+          fieldName="Name"
+          tooltipText="The name of the component entity. This name is both meant for human eyes to recognize the entity, and for machines and other components to reference the entity. Must be unique"
+          required
+        />
         <Controller
           name={`entities.${index}.name`}
           control={control}
@@ -67,11 +69,13 @@ export const ComponentForm = ({
           {errors?.name?.message || '\u00A0'}
         </span>
       </div>
+
       <div>
-        <p style={{ fontSize: '0.75rem' }}>
-          Entity owner
-          <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
-        </p>
+        <FieldHeader
+          fieldName="Owner"
+          tooltipText="A reference to the owner (commonly a team), that bears ultimate responsibility for the component, and has the authority and capability to develop and maintain it"
+          required
+        />
         <Controller
           name={`entities.${index}.owner`}
           control={control}
@@ -98,10 +102,11 @@ export const ComponentForm = ({
 
       <Flex>
         <div>
-          <p style={{ fontSize: '0.75rem' }}>
-            Entity lifecycle
-            <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
-          </p>
+          <FieldHeader
+            fieldName="Lifecycle"
+            tooltipText="The lifecycle state of the component"
+            required
+          />
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
@@ -133,10 +138,11 @@ export const ComponentForm = ({
         </div>
 
         <div style={{ flexGrow: 1 }}>
-          <p style={{ fontSize: '0.75rem' }}>
-            Entity type
-            <span style={{ color: '#ff0000', fontSize: '1rem' }}>*</span>
-          </p>
+          <FieldHeader
+            fieldName="Type"
+            tooltipText="The type of the component."
+            required
+          />
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
@@ -155,7 +161,10 @@ export const ComponentForm = ({
         </div>
       </Flex>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Entity system</p>
+        <FieldHeader
+          fieldName="System"
+          tooltipText="Reference to the system which the component belongs to"
+        />
         <Controller
           name={`entities.${index}.system`}
           control={control}
@@ -180,7 +189,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Provides APIs</p>
+        <FieldHeader
+          fieldName="Provides APIs"
+          tooltipText="References to all the APIs the component may provide. This does not define the API-entity itself"
+        />
         <Controller
           name={`entities.${index}.providesApis`}
           control={control}
@@ -239,7 +251,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Consumes APIs</p>
+        <FieldHeader
+          fieldName="Consumes APIs"
+          tooltipText="APIs that are consumed by the component"
+        />
         <Controller
           name={`entities.${index}.consumesApis`}
           control={control}
@@ -298,7 +313,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Depends on</p>
+        <FieldHeader
+          fieldName="Depends on"
+          tooltipText="References to other components and/or resources that the component depends on"
+        />
         <Controller
           name={`entities.${index}.dependsOn`}
           control={control}

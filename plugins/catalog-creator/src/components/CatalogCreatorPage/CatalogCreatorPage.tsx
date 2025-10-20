@@ -31,6 +31,7 @@ export const CatalogCreatorPage = () => {
   const githubController = new GithubController();
 
   const [url, setUrl] = useState('');
+  const [defaultName, setDefaultName] = useState<string>('');
 
   const [catalogInfoState, doFetchCatalogInfo] = useAsyncFn(
     async (catInfoUrl: string | null) => {
@@ -71,6 +72,13 @@ export const CatalogCreatorPage = () => {
     ],
   );
 
+  function getDefaultNameFromUrl() {
+    const regexMatch = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    if (regexMatch && regexMatch[2]) {
+      setDefaultName(regexMatch[2]);
+    }
+  }
+
   return (
     <Page themeId="tool">
       <Content>
@@ -93,6 +101,7 @@ export const CatalogCreatorPage = () => {
                   <Link
                     onClick={() => {
                       setUrl('');
+                      setDefaultName('');
                       doSubmitToGithub('', undefined);
                     }}
                   >
@@ -107,6 +116,7 @@ export const CatalogCreatorPage = () => {
                 onSubmit={e => {
                   e.preventDefault();
                   doAnalyzeUrl();
+                  getDefaultNameFromUrl();
                   doSubmitToGithub('', undefined);
                 }}
               >
@@ -175,6 +185,7 @@ export const CatalogCreatorPage = () => {
                           )
                         }
                         currentYaml={catalogInfoState.value}
+                        defaultName={defaultName}
                       />
                     )}
                 </div>

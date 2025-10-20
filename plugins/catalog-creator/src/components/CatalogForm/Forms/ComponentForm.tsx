@@ -1,8 +1,12 @@
 import { Flex, Select, TextField } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
-import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
-import { formSchema } from '../../../schemas/formSchema';
+import {
+  AllowedLifecycleStages,
+  EntityErrors,
+  Kind,
+} from '../../../model/types';
+import { apiSchema, formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
 import { useAsync } from 'react-use';
@@ -16,6 +20,7 @@ export type ComponentFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'Component'>;
+  appendHandler: (entityKindToAdd: Kind, name?: string) => void;
   systems: Entity[];
   owners: Entity[];
 };
@@ -25,6 +30,7 @@ export const ComponentForm = ({
   control,
   errors,
   owners,
+  appendHandler,
   systems,
 }: ComponentFormProps) => {
   const catalogApi = useApi(catalogApiRef);
@@ -203,9 +209,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                const names = newValue.map(item =>
-                  typeof item === 'string' ? item : item.metadata.name,
-                );
+                const names = newValue.map(item => {
+                  if (typeof item === 'string') {
+                    if (
+                      !fetchAPIs.value?.some(
+                        api => api.metadata.name === item,
+                      ) &&
+                      !value?.some(oldInput => oldInput === item)
+                    ) {
+                      const result = apiSchema
+                        .pick({ name: true })
+                        .safeParse({ name: item });
+                      if (result.success) {
+                        appendHandler('API', item);
+                      }
+                    }
+                    return item;
+                  }
+                  return item.metadata.name;
+                });
                 onChange(names);
               }}
               options={fetchAPIs.value || []}

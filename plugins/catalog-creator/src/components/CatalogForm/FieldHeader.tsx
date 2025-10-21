@@ -34,7 +34,7 @@ export const FieldHeader = ({
               color: '#cbcbcbff',
             }}
           >
-            <InfoOutlinedIcon sx={{ scale: '90%' }} />
+            <InfoOutlinedIcon sx={{ scale: '70%' }} />
           </div>
         </Tooltip>
       )}

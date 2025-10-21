@@ -1,0 +1,8 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: asdas
+spec:
+  type: asd
+  owner: felles_kartdatabase
+  lifecycle: production

@@ -1,6 +1,6 @@
 import { Flex } from '@backstage/ui';
 import { Tooltip } from '@material-ui/core';
-import InfoOutlinedIcon from '@mui/icons-material/infoOutlined';
+import { InfoOutlined } from '@mui/icons-material';
 
 type FieldHeaderProps = {
   fieldName: string;
@@ -34,7 +34,7 @@ export const FieldHeader = ({
               color: '#cbcbcbff',
             }}
           >
-            <InfoOutlinedIcon sx={{ scale: '70%' }} />
+            <InfoOutlined sx={{ scale: '70%' }} />
           </div>
         </Tooltip>
       )}

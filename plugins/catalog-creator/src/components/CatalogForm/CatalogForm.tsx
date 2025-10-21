@@ -250,16 +250,16 @@ export const CatalogForm = ({
                   </Flex>
 
                   <div>
+                    <FieldHeader
+                      fieldName="Name"
+                      required
+                      tooltipText="The name of the component entity. This name is both meant for human eyes to recognize the entity, and for machines and other components to reference the entity. Must be unique"
+                    />
                     <Controller
                       name={`entities.${index}.name`}
                       control={control}
                       render={({ field }) => (
-                        <TextField
-                          {...field}
-                          name="Name"
-                          label="Entity name"
-                          isRequired
-                        />
+                        <TextField {...field} name="Name" />
                       )}
                     />
 

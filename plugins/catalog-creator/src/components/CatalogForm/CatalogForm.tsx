@@ -31,6 +31,7 @@ import { useState } from 'react';
 import Divider from '@mui/material/Divider';
 import CatalogSearch from '../CatalogSearch';
 import { SystemForm } from './Forms/SystemForm';
+import { FieldHeader } from './FieldHeader';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
@@ -272,8 +273,12 @@ export const CatalogForm = ({
                       {errors?.entities?.[index]?.name?.message || '\u00A0'}
                     </span>
                   </div>
-
                   <div>
+                    <FieldHeader
+                      fieldName="Owner"
+                      tooltipText="A reference to the owner (commonly a team), that bears ultimate responsibility for the component, and has the authority and capability to develop and maintain it"
+                      required
+                    />
                     <Controller
                       name={`entities.${index}.owner`}
                       control={control}
@@ -281,9 +286,7 @@ export const CatalogForm = ({
                         <CatalogSearch
                           onChange={onChange}
                           onBlur={onBlur}
-                          label="Entity owner"
                           value={value}
-                          isRequired
                           entityList={fetchOwners.value || []}
                         />
                       )}
@@ -293,7 +296,9 @@ export const CatalogForm = ({
                       style={{
                         color: 'red',
                         fontSize: '0.75rem',
-                        visibility: errors?.entities ? 'visible' : 'hidden',
+                        visibility: errors.entities?.[index]?.owner
+                          ? 'visible'
+                          : 'hidden',
                       }}
                     >
                       {errors.entities?.[index]?.owner?.message || '\u00A0'}

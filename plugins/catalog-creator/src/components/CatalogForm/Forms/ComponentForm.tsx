@@ -22,14 +22,12 @@ export type ComponentFormProps = {
   errors: EntityErrors<'Component'>;
   appendHandler: (entityKindToAdd: Kind, name?: string) => void;
   systems: Entity[];
-  owners: Entity[];
 };
 
 export const ComponentForm = ({
   index,
   control,
   errors,
-  owners,
   appendHandler,
   systems,
 }: ComponentFormProps) => {
@@ -73,36 +71,6 @@ export const ComponentForm = ({
           }}
         >
           {errors?.name?.message || '\u00A0'}
-        </span>
-      </div>
-
-      <div>
-        <FieldHeader
-          fieldName="Owner"
-          tooltipText="A reference to the owner (commonly a team), that bears ultimate responsibility for the component, and has the authority and capability to develop and maintain it"
-          required
-        />
-        <Controller
-          name={`entities.${index}.owner`}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CatalogSearch
-              onChange={onChange}
-              onBlur={onBlur}
-              value={value}
-              entityList={owners}
-            />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.owner ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.owner?.message || '\u00A0'}
         </span>
       </div>
 

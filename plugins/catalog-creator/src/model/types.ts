@@ -11,7 +11,13 @@ export enum AllowedEntityKinds {
   Resource = 'Resource',
 }
 
-export type Kind = 'Component' | 'API';
+const Kinds = {
+  API: 'API',
+  Component: 'Component',
+  System: 'System',
+} as const;
+
+export type Kind = (typeof Kinds)[keyof typeof Kinds];
 
 export enum AllowedLifecycleStages {
   development = 'development',
@@ -22,7 +28,7 @@ export enum AllowedLifecycleStages {
 export type Status = {
   message: string;
   severity: 'error' | 'success' | 'warning' | 'info';
-  url?: string;
+  prUrl?: string;
 };
 
 export type FormEntity = z.infer<typeof entitySchema>;

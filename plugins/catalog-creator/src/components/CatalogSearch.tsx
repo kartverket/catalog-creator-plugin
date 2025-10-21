@@ -11,8 +11,8 @@ interface CatalogSearchProps {
   onChange: (entity: string | null) => void;
   onBlur: () => void;
 
-  label: string;
-  isRequired: boolean;
+ 
+  
 }
 
 export const CatalogSearch = ({
@@ -20,15 +20,14 @@ export const CatalogSearch = ({
   entityList,
   value,
   onBlur,
-  label,
-  isRequired,
 }: CatalogSearchProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const filteredEntities =
     value !== undefined
-      ? entityList.filter(({ metadata: { name } }) => {
-          return name.includes(value.toLowerCase());
+      ? entityList.filter(({ metadata }) => {
+          const titleOrName = metadata.title ?? metadata.name;
+          return titleOrName.toLowerCase().includes(value.toLowerCase());
         })
       : entityList;
 
@@ -57,8 +56,6 @@ export const CatalogSearch = ({
         <SearchField
           placeholder="Search..."
           value={value}
-          label={label}
-          isRequired={isRequired}
           onChange={input => {
             onChange(input);
           }}
@@ -87,7 +84,9 @@ export const CatalogSearch = ({
                     onBlur();
                   }}
                 >
-                  <ListItemText primary={entity.metadata.name} />
+                  <ListItemText
+                    primary={entity.metadata.title ?? entity.metadata.name}
+                  />
                 </ListItemButton>
               ))}
             </List>

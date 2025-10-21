@@ -1,4 +1,13 @@
-import { Button, Box, Flex, Select, Icon, Card } from '@backstage/ui';
+import {
+  Button,
+  Box,
+  Flex,
+  Select,
+  Icon,
+  Card,
+  Text,
+  TextField,
+} from '@backstage/ui';
 
 import type {
   EntityErrors,
@@ -19,13 +28,22 @@ import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import { useApi } from '@backstage/core-plugin-api';
 import { Entity } from '@backstage/catalog-model';
 import { useState } from 'react';
+import Divider from '@mui/material/Divider';
+import CatalogSearch from '../CatalogSearch';
+import { SystemForm } from './Forms/SystemForm';
+import { FieldHeader } from './FieldHeader';
 
 export type CatalogFormProps = {
   onSubmit: (data: FormEntity[]) => void;
   currentYaml: RequiredYamlFields[] | null;
+  defaultName?: string;
 };
 
-export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
+export const CatalogForm = ({
+  onSubmit,
+  currentYaml,
+  defaultName = '',
+}: CatalogFormProps) => {
   const catalogApi = useApi(catalogApiRef);
 
   const fetchOwners = useAsync(async () => {
@@ -78,7 +96,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             {
               id: 0,
               kind: 'Component',
-              name: '',
+              name: defaultName,
               owner: '',
             },
           ],
@@ -95,14 +113,14 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
   const [indexCount, setIndexCount] = useState(fields.length);
   const [addEntityKind, setAddEntityKind] = useState<Kind>('Component');
 
-  const appendHandler = () => {
+  const appendHandler = (entityKindToAdd: Kind, name = '') => {
     let entity: z.infer<typeof entitySchema>;
-    switch (addEntityKind) {
+    switch (entityKindToAdd) {
       case 'Component' as Kind:
         entity = {
           id: indexCount,
-          kind: addEntityKind,
-          name: '',
+          kind: entityKindToAdd,
+          name: name,
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
           entityType: '',
@@ -110,6 +128,18 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         };
         break;
       case 'API' as Kind:
+        entity = {
+          id: indexCount,
+          kind: entityKindToAdd,
+          name: name,
+          owner: '',
+          lifecycle: AllowedLifecycleStages.production,
+          entityType: '',
+          system: '',
+          definition: '',
+        };
+        break;
+      case 'System' as Kind:
         entity = {
           id: indexCount,
           kind: addEntityKind,
@@ -125,7 +155,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
         entity = {
           id: indexCount,
           kind: addEntityKind,
-          name: '',
+          name: name,
           owner: '',
           lifecycle: AllowedLifecycleStages.production,
           entityType: '',
@@ -147,7 +177,7 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'Component'>}
-            owners={fetchOwners.value || []}
+            appendHandler={appendHandler}
             systems={fetchSystems.value || []}
           />
         );
@@ -157,12 +187,20 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
             index={index}
             control={control}
             errors={errors?.entities?.[index] as EntityErrors<'API'>}
-            owners={fetchOwners.value || []}
             systems={fetchSystems.value || []}
           />
         );
+      case 'System':
+        return (
+          <SystemForm
+            index={index}
+            control={control}
+            errors={errors?.entities?.[index] as EntityErrors<'System'>}
+            owners={fetchOwners.value || []}
+          />
+        );
       default:
-        return <p>A form for this kind does not exist</p>;
+        return <></>;
     }
   };
 
@@ -210,21 +248,76 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                       </Button>
                     )}
                   </Flex>
+
+                  <div>
+                    <FieldHeader
+                      fieldName="Name"
+                      required
+                      tooltipText="The name of the component entity. This name is both meant for human eyes to recognize the entity, and for machines and other components to reference the entity. Must be unique"
+                    />
+                    <Controller
+                      name={`entities.${index}.name`}
+                      control={control}
+                      render={({ field }) => (
+                        <TextField {...field} name="Name" />
+                      )}
+                    />
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors?.entities ? 'visible' : 'hidden',
+                      }}
+                    >
+                      {errors?.entities?.[index]?.name?.message || '\u00A0'}
+                    </span>
+                  </div>
+                  <div>
+                    <FieldHeader
+                      fieldName="Owner"
+                      tooltipText="A reference to the owner (commonly a team), that bears ultimate responsibility for the component, and has the authority and capability to develop and maintain it"
+                      required
+                    />
+                    <Controller
+                      name={`entities.${index}.owner`}
+                      control={control}
+                      render={({ field: { onChange, onBlur, value } }) => (
+                        <CatalogSearch
+                          onChange={onChange}
+                          onBlur={onBlur}
+                          value={value}
+                          entityList={fetchOwners.value || []}
+                        />
+                      )}
+                    />
+
+                    <span
+                      style={{
+                        color: 'red',
+                        fontSize: '0.75rem',
+                        visibility: errors.entities?.[index]?.owner
+                          ? 'visible'
+                          : 'hidden',
+                      }}
+                    >
+                      {errors.entities?.[index]?.owner?.message || '\u00A0'}
+                    </span>
+                  </div>
+
                   {getEntityForm(entity, index)}
                 </Flex>
               </Card>
             );
           })}
 
-          <Flex
-            direction="row"
-            align="end"
-            justify="between"
-            style={{ paddingTop: '1rem' }}
-          >
-            <Flex align="end">
+          <Flex direction="column">
+            <Text style={{ fontWeight: 'bold', marginTop: '1.5rem' }}>
+              Add Entity
+            </Text>
+            <Flex align="end" justify="start">
               <Select
-                label="Select entity kind"
+                label="Select kind"
                 selectedKey={addEntityKind}
                 onSelectionChange={value => setAddEntityKind(value as Kind)}
                 options={Object.values(AllowedEntityKinds).map(
@@ -234,10 +327,16 @@ export const CatalogForm = ({ onSubmit, currentYaml }: CatalogFormProps) => {
                   }),
                 )}
               />
-              <Button type="button" onClick={() => appendHandler()}>
+              <Button
+                type="button"
+                onClick={() => appendHandler(addEntityKind)}
+              >
                 Add Entity
               </Button>
             </Flex>
+          </Flex>
+          <Divider sx={{ marginY: '1.5rem' }} />
+          <Flex justify="end">
             <Button variant="primary" type="submit">
               Create pull request
             </Button>

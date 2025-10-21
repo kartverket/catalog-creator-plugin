@@ -1,8 +1,12 @@
 import { Flex, Select, TextField } from '@backstage/ui';
 import { Control, Controller } from 'react-hook-form';
 import CatalogSearch from '../../CatalogSearch';
-import { AllowedLifecycleStages, EntityErrors } from '../../../model/types';
-import { formSchema } from '../../../schemas/formSchema';
+import {
+  AllowedLifecycleStages,
+  EntityErrors,
+  Kind,
+} from '../../../model/types';
+import { apiSchema, formSchema } from '../../../schemas/formSchema';
 import z from 'zod/v4';
 import { Entity } from '@backstage/catalog-model';
 import { useAsync } from 'react-use';
@@ -10,12 +14,13 @@ import { useApi } from '@backstage/core-plugin-api';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
 import Autocomplete from '@mui/material/Autocomplete';
 import MuiTextField from '@mui/material/TextField';
+import { FieldHeader } from '../FieldHeader';
 
 export type ComponentFormProps = {
   index: number;
   control: Control<z.infer<typeof formSchema>>;
   errors: EntityErrors<'Component'>;
-  owners: Entity[];
+  appendHandler: (entityKindToAdd: Kind, name?: string) => void;
   systems: Entity[];
 };
 
@@ -23,7 +28,7 @@ export const ComponentForm = ({
   index,
   control,
   errors,
-  owners,
+  appendHandler,
   systems,
 }: ComponentFormProps) => {
   const catalogApi = useApi(catalogApiRef);
@@ -46,61 +51,19 @@ export const ComponentForm = ({
 
   return (
     <Flex direction="column" justify="start">
-      <div>
-        <Controller
-          name={`entities.${index}.name`}
-          control={control}
-          render={({ field }) => (
-            <TextField {...field} name="Name" label="Entity name" isRequired />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.name ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.name?.message || '\u00A0'}
-        </span>
-      </div>
-      <div>
-        <Controller
-          name={`entities.${index}.owner`}
-          control={control}
-          render={({ field: { onChange, onBlur, value } }) => (
-            <CatalogSearch
-              onChange={onChange}
-              onBlur={onBlur}
-              label="Entity owner"
-              value={value}
-              isRequired
-              entityList={owners}
-            />
-          )}
-        />
-
-        <span
-          style={{
-            color: 'red',
-            fontSize: '0.75rem',
-            visibility: errors?.owner ? 'visible' : 'hidden',
-          }}
-        >
-          {errors?.owner?.message || '\u00A0'}
-        </span>
-      </div>
-
       <Flex>
         <div>
+          <FieldHeader
+            fieldName="Lifecycle"
+            tooltipText="The lifecycle state of the component"
+            required
+          />
           <Controller
             name={`entities.${index}.lifecycle`}
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <Select
                 name="lifecycle"
-                label="Entity lifecycle"
                 onBlur={onBlur}
                 onSelectionChange={onChange}
                 selectedKey={value}
@@ -110,7 +73,6 @@ export const ComponentForm = ({
                     label: lifecycleStage,
                   }),
                 )}
-                isRequired
               />
             )}
           />
@@ -127,17 +89,15 @@ export const ComponentForm = ({
         </div>
 
         <div style={{ flexGrow: 1 }}>
+          <FieldHeader
+            fieldName="Type"
+            tooltipText="The type of the component."
+            required
+          />
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                name="Entity type"
-                label="Entity type"
-                isRequired
-              />
-            )}
+            render={({ field }) => <TextField {...field} name="Entity type" />}
           />
 
           <span
@@ -152,6 +112,10 @@ export const ComponentForm = ({
         </div>
       </Flex>
       <div>
+        <FieldHeader
+          fieldName="System"
+          tooltipText="Reference to the system which the component belongs to"
+        />
         <Controller
           name={`entities.${index}.system`}
           control={control}
@@ -159,9 +123,7 @@ export const ComponentForm = ({
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
-              label="Entity system"
               value={value}
-              isRequired={false}
               entityList={systems}
             />
           )}
@@ -178,7 +140,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Provides APIs</p>
+        <FieldHeader
+          fieldName="Provides APIs"
+          tooltipText="References to all the APIs the component may provide. This does not define the API-entity itself"
+        />
         <Controller
           name={`entities.${index}.providesApis`}
           control={control}
@@ -189,12 +154,41 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item => {
+                  if (typeof item === 'string') {
+                    if (
+                      !fetchAPIs.value?.some(
+                        api => api.metadata.name === item,
+                      ) &&
+                      !value?.some(oldInput => oldInput === item)
+                    ) {
+                      const result = apiSchema
+                        .pick({ name: true })
+                        .safeParse({ name: item });
+                      if (result.success) {
+                        appendHandler('API', item);
+                      }
+                    }
+                    return item;
+                  }
+                  return item.metadata.name;
+                });
+                onChange(names);
               }}
-              options={
-                fetchAPIs.value?.map(entity => entity.metadata.name) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchAPIs.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               renderInput={params => (
                 <MuiTextField
@@ -224,7 +218,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Consumes APIs</p>
+        <FieldHeader
+          fieldName="Consumes APIs"
+          tooltipText="APIs that are consumed by the component"
+        />
         <Controller
           name={`entities.${index}.consumesApis`}
           control={control}
@@ -235,12 +232,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item =>
+                  typeof item === 'string' ? item : item.metadata.name,
+                );
+                onChange(names);
               }}
-              options={
-                fetchAPIs.value?.map(entity => entity.metadata.name) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchAPIs.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               renderInput={params => (
                 <MuiTextField
@@ -270,7 +280,10 @@ export const ComponentForm = ({
         </span>
       </div>
       <div>
-        <p style={{ fontSize: '0.75rem' }}>Depends on</p>
+        <FieldHeader
+          fieldName="Depends on"
+          tooltipText="References to other components and/or resources that the component depends on"
+        />
         <Controller
           name={`entities.${index}.dependsOn`}
           control={control}
@@ -281,14 +294,25 @@ export const ComponentForm = ({
               value={value || []}
               onBlur={onBlur}
               onChange={(_, newValue) => {
-                onChange(newValue);
+                const names = newValue.map(item =>
+                  typeof item === 'string' ? item : item.metadata.name,
+                );
+                onChange(names);
               }}
-              options={
-                fetchComponentsAndResources.value?.map(
-                  entity => entity.metadata.name,
-                ) || []
-              }
-              getOptionLabel={api => api}
+              options={fetchComponentsAndResources.value || []}
+              getOptionLabel={option => {
+                if (typeof option === 'string') return option;
+                return option.metadata.title ?? option.metadata.name;
+              }}
+              isOptionEqualToValue={(option, selectedValue) => {
+                const optionName =
+                  typeof option === 'string' ? option : option.metadata.name;
+                const valueName =
+                  typeof selectedValue === 'string'
+                    ? selectedValue
+                    : selectedValue.metadata?.name;
+                return optionName === valueName;
+              }}
               size="small"
               sx={{
                 '& .MuiInputBase-input': {

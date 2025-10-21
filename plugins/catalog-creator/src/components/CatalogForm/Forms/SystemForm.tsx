@@ -8,6 +8,7 @@ import CatalogSearch from '../../CatalogSearch';
 import { useAsync } from 'react-use';
 import { useApi } from '@backstage/core-plugin-api';
 import { catalogApiRef } from '@backstage/plugin-catalog-react';
+import { FieldHeader } from '../FieldHeader';
 
 export type SystemFormProps = {
   index: number;
@@ -31,12 +32,11 @@ export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
     <Flex direction="column" justify="start">
       <Flex>
         <div style={{ flexGrow: 1 }}>
+          <FieldHeader fieldName="Type" tooltipText="The type of the system" />
           <Controller
             name={`entities.${index}.entityType`}
             control={control}
-            render={({ field }) => (
-              <TextField {...field} name="Entity type" label="Entity type" />
-            )}
+            render={({ field }) => <TextField {...field} name="Type" />}
           />
 
           <span
@@ -51,6 +51,10 @@ export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
         </div>
       </Flex>
       <div>
+        <FieldHeader
+          fieldName="Domain"
+          tooltipText="Reference to the domain the system is a part of"
+        />
         <Controller
           name={`entities.${index}.domain`}
           control={control}
@@ -58,9 +62,7 @@ export const SystemForm = ({ index, control, errors }: SystemFormProps) => {
             <CatalogSearch
               onChange={onChange}
               onBlur={onBlur}
-              label="Entity domain"
               value={value}
-              isRequired={false}
               entityList={fetchDomains.value || []}
             />
           )}
